@@ -1,0 +1,11 @@
+Study 2 was NOT registered on OSF. Decision of the authors, 17 November 2026.
+
+Public record of the analysis plan before data collection:
+https://github.com/Pepebeats-flp/llm-public-goods-audit/commit/28b8b11bb021562ce249803fff693b61bb4eca78
+
+That commit contains preregistration_study2.md, its hash manifest, the code and the 19
+configurations, and was pushed to the public repository before the first confirmatory
+call of Study 2. The commit that adds this file was also pushed before launching.
+
+This is a deviation from section "Status" of preregistration_study2.md, which announced
+an OSF registration. It will be reported as such in the paper.
