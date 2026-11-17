@@ -1,0 +1,27 @@
+{
+  "n": 4,
+  "endowment": 20,
+  "temperature": 1.0,
+  "min_interval": 1.5,
+  "group": "study2",
+  "gate_file": "../paper_ssc2027/OSF_REGISTRATION.txt",
+  "runner": "repeated",
+  "mpcr": 0.4,
+  "rounds": 10,
+  "run_id": "study2_rep_off_qwen3_8-flash",
+  "models": [
+    {
+      "model": "qwen3.8-flash",
+      "effort": "none"
+    }
+  ],
+  "variants": [
+    "P0",
+    "F2",
+    "F3"
+  ],
+  "groups": 15,
+  "composition": "homogeneous",
+  "max_allowance_usd": 1.5,
+  "seed": 2027402
+}

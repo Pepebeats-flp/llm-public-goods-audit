@@ -42,6 +42,10 @@ python3 -m pgg.figures --tag final                                   # figures
 
 Collecting new data requires an OpenAI-compatible endpoint and key; see `llm-public-goods-study/README.md` (in Spanish) and `pgg/llm.py`.
 
+## Study 2 (registered, not yet run)
+
+A second study completes the reasoning arm with all eight prompt variants and adds a repeated game with interacting agents. Its analysis plan is `paper_ssc2027/preregistration_study2.md`, with file hashes in `preregistration_study2_manifest.txt`. The launcher does not start Study 2 until the public registration URL is recorded in `paper_ssc2027/OSF_REGISTRATION.txt`.
+
 ## Things to know before reusing the data
 
 - The pilot run (`pilot_20261117`) was inspected before the analysis plan was fixed. It is kept for transparency and is excluded from every reported result.

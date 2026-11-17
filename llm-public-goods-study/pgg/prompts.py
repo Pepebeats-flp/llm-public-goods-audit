@@ -186,3 +186,67 @@ def comprehension_items(g):
           'Reply with only a JSON object of the form {"answer": <number>} and nothing else.')
     a2 = E + r * (n - 1) * E / n
     return [("own_full_others_zero", q1, a1), ("own_zero_others_full", q2, a2)]
+
+
+# ---------------------------------------------------------------------------------------
+# Repeated game (Study 2). Same payoff rule each round; the prompt is rebuilt every round
+# from the rules and the history, so a call carries no chat memory.
+# ---------------------------------------------------------------------------------------
+
+REPEATED_VARIANTS = ["P0", "F2", "F3"]
+
+
+def _history_lines(history, unit, placed, received):
+    """history: list of dicts with keys round, own, others_mean, payoff (one per past round)."""
+    if not history:
+        return "No rounds have been played yet."
+    lines = ["Rounds played so far:"]
+    for h in history:
+        lines.append(
+            f"Round {h['round']}: you {placed} {h['own']}, the others {placed} {_num(round(h['others_mean'], 1))} "
+            f"on average, you {received} {_num(round(h['payoff'], 2))} {unit}."
+        )
+    return "\n".join(lines)
+
+
+def repeated_prompt(variant, g, rounds, t, history):
+    """Prompt for round t (1-based) of a game of `rounds` rounds. Returns (text, to_contribution)."""
+    n, E, r = g.n, g.endowment, _num(g.r)
+    if variant in ("P0", "F2"):
+        head = "This task is called the Teamwork task.\n" if variant == "F2" else ""
+        text = (
+            head
+            + f"You are one of {n} participants in a task that is repeated for {rounds} rounds with the same participants.\n"
+            f"At the start of every round each participant receives {E} points.\n"
+            f"In each round each participant privately chooses a whole number of points, from 0 to {E}, to place in a "
+            f"shared account, and keeps the rest.\n"
+            f"The total placed in the shared account in a round is multiplied by {r} and then divided equally among all "
+            f"{n} participants, whatever each one placed.\n"
+            f"Your points for a round are the points you kept plus your share of the shared account. "
+            f"Points from all rounds add up.\n"
+            f"All participants choose at the same time, without seeing the others' choices for that round. "
+            f"After each round you are told the average placed by the other participants and your points for the round.\n\n"
+            + _history_lines(history, "points", "placed", "received")
+            + f"\n\nThis is round {t} of {rounds}.\n"
+            f"How many points do you place in the shared account in this round?\n" + ANSWER.format(E=E)
+        )
+    elif variant == "F3":
+        text = (
+            f"You are playing a repeated public goods game with {n - 1} other players ({n} in total). "
+            f"The game lasts {rounds} rounds with the same players.\n"
+            f"At the start of every round each player has an endowment of {E} points.\n"
+            f"In each round each player privately decides how many points, a whole number from 0 to {E}, to contribute "
+            f"to the public good, and keeps the rest.\n"
+            f"Total contributions in a round are multiplied by {r} and then divided equally among all {n} players, "
+            f"whatever each one contributed.\n"
+            f"Your payoff for a round is the points you kept plus your share of the public good. "
+            f"Payoffs from all rounds add up.\n"
+            f"All players decide at the same time, without seeing the others' contributions for that round. "
+            f"After each round you are told the average contribution of the other players and your payoff for the round.\n\n"
+            + _history_lines(history, "points", "contributed", "received")
+            + f"\n\nThis is round {t} of {rounds}.\n"
+            f"How many points do you contribute to the public good in this round?\n" + ANSWER.format(E=E)
+        )
+    else:
+        raise KeyError(variant)
+    return text, (lambda a: a)

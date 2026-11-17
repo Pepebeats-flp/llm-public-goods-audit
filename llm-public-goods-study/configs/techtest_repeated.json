@@ -1,0 +1,24 @@
+{
+  "run_id": "techtest_repeated",
+  "group": "techtest",
+  "runner": "repeated",
+  "n": 4,
+  "endowment": 20,
+  "mpcr": 0.4,
+  "rounds": 10,
+  "models": [
+    {
+      "model": "glm-5.3-flash",
+      "effort": "none"
+    }
+  ],
+  "variants": [
+    "P0"
+  ],
+  "groups": 2,
+  "composition": "homogeneous",
+  "temperature": 1.0,
+  "min_interval": 1.5,
+  "max_allowance_usd": 0.1,
+  "seed": 1
+}

@@ -1,0 +1,27 @@
+{
+  "n": 4,
+  "endowment": 20,
+  "temperature": 1.0,
+  "min_interval": 1.5,
+  "group": "study2",
+  "gate_file": "../paper_ssc2027/OSF_REGISTRATION.txt",
+  "runner": "repeated",
+  "mpcr": 0.4,
+  "rounds": 10,
+  "run_id": "study2_rep_on_deepseek-v4_1-flash",
+  "models": [
+    {
+      "model": "deepseek-v4.1-flash",
+      "effort": "high"
+    }
+  ],
+  "variants": [
+    "P0",
+    "F2",
+    "F3"
+  ],
+  "groups": 10,
+  "composition": "homogeneous",
+  "max_allowance_usd": 2.5,
+  "seed": 2027500
+}

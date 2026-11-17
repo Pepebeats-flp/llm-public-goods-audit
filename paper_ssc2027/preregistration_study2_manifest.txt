@@ -1,0 +1,33 @@
+SHA-256 of the files fixed by the Study 2 preregistration. Generated 2026-11-17T23:13:04Z, before any confirmatory call of Study 2.
+
+730ad45de0332608f92eebb53cfc1c464bf168b8e3ed910152e2bc84a96a32e3  paper_ssc2027/preregistration_study2.md
+3b25022050dd00b923aea8677140071ce817ace9b447dfc0d9630fee2667cb61  llm-public-goods-study/pgg/prompts.py
+b067e14de2af61b76c41aa2ce1ec3b93bc7060b097897aa97ffb5ff5dede5bcc  llm-public-goods-study/pgg/game.py
+fa7ea5034915bad7be4cea8d159938c77cdf806f82243738eab3c5f793ae0e3d  llm-public-goods-study/pgg/llm.py
+d29e75dd6ce09f3a79994542f74b0011ae4d0a0a3ce8bade4d0861dc941f80e2  llm-public-goods-study/pgg/run_oneshot.py
+f61c953b73701d0d3eb9427a0ab7f87c21b69b66ee8e0138bbe7bcaa9266499e  llm-public-goods-study/pgg/run_repeated.py
+e4a52aafaf75c571005f6dfc15e331579ee7705d90eac4ace93cee43166d8054  llm-public-goods-study/pgg/analyze_study2.py
+cb38a3c4c9d3f7f2dc934c23bd0bfe1f7c3dcba04b709717344793667b4caa57  llm-public-goods-study/pgg/analyze_repeated.py
+772ced4784380725b511bb67f0fa956970227c5e05bbd5079d65ee32addc2838  llm-public-goods-study/configs/study2_on_claude-haiku-5-5.json
+e22d7511ecdfadcc1988a89abb9b17ed797d62533c92f269a4f1c3a45af81941  llm-public-goods-study/configs/study2_on_deepseek-v4_1-flash.json
+2c595efb8d35c0296bb6cfb018fc842a5686d9449617d6c5b4c89448caec0f82  llm-public-goods-study/configs/study2_on_glm-5_3-flash.json
+c33a6d01a3fa4202f5a13996ff0281e5060a9623b81850d99dcbf9007fd79e0b  llm-public-goods-study/configs/study2_on_hy3.json
+446cdb312705807bbdb75cbb947575b4fe7253a123bee42726bf16cd726f3c29  llm-public-goods-study/configs/study2_on_qwen3_8-flash.json
+a3422c36a727c24465831e9ed31076f7a4911f18f5a5970a267de14facd86b5c  llm-public-goods-study/configs/study2_rep_mix_claude-haiku-5-5.json
+1c2fde8fe630edb37c9f0b67bbbfba34d659a51407f7811526dc686b551cf7ce  llm-public-goods-study/configs/study2_rep_mix_deepseek-v4_1-flash.json
+eaf66d5cabe631b5c96746b0e335d07dca448f5666ddc6977e5ae16a983c8aaa  llm-public-goods-study/configs/study2_rep_mix_glm-5_3-flash.json
+ac68acaabcf6c8a215813e32b456cf96b1ae2b044b0dc24b64988a0ddba00992  llm-public-goods-study/configs/study2_rep_mix_gpt-5_6-luna.json
+43e8ab8893ee9475aef45cfa33f26039428b64c0f97a0b5f20fac98bc37e2435  llm-public-goods-study/configs/study2_rep_mix_hy3.json
+406267422a9a4d201f3c4ab6e478983d562654938c919a4f051345d5ecd77fb2  llm-public-goods-study/configs/study2_rep_mix_qwen3_8-flash.json
+4bb9e0445042aae198c7221192b2598f4ef58f36fa51b36e5f8e06e30fb090e3  llm-public-goods-study/configs/study2_rep_off_claude-haiku-5-5.json
+caa1a61098204906257244f472a11aff6bf9943a8355208e18442a78921c46d7  llm-public-goods-study/configs/study2_rep_off_deepseek-v4_1-flash.json
+a6c58732608396fe95c68484887e2ef16624e82df717ec86247a6b205609ff2f  llm-public-goods-study/configs/study2_rep_off_glm-5_3-flash.json
+77803687f3157a70e5dc591fe57387b433f17f974ea9e255d6d0248f8b640205  llm-public-goods-study/configs/study2_rep_off_gpt-5_6-luna.json
+eee0c853e19ce858c93faede24a3d146ad7198721a6b1f95b814156bdf49f9f1  llm-public-goods-study/configs/study2_rep_off_hy3.json
+78ca11cf5a8cecd5b92020343d9993c891cd03ad82dfe4514955dbb7076e4d7d  llm-public-goods-study/configs/study2_rep_off_qwen3_8-flash.json
+83a1a038e0dff72ee92e145a8f4ee637a1e21fd2283003c97a504c5483421c18  llm-public-goods-study/configs/study2_rep_on_deepseek-v4_1-flash.json
+b491e3719cd7fb8963548560cbe51bdfa313e756f49dc26ed8ffb5ef40b289cf  llm-public-goods-study/configs/study2_rep_on_glm-5_3-flash.json
+
+Note. pgg/prompts.py gained the repeated-game prompt builder for Study 2. The eight one-shot
+prompt texts of Study 1 are unchanged, but the hash of the file therefore differs from the one
+in preregistration_manifest.txt, which corresponds to the file at commit 2d506de.

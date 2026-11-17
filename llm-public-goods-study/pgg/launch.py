@@ -4,14 +4,16 @@
   python3 -m pgg.launch --no-watch  # start and return
   python3 -m pgg.launch --stop      # stop the supervisor and all runs (they can be resumed later)
 
-One detached process per config in configs/final_*.json, plus a detached supervisor that
+One detached process per study config in configs/ (group "final" or "study2"), plus a detached supervisor that
 checks every 30 s and restarts a run that died before finishing. Runs are resumable, so a
 restart never repeats a completed cell. Closing the terminal or pressing Ctrl+C in the
 status view does not stop anything. Running this command again is safe: it starts only
 what is not already running or finished.
 
 The supervisor does not restart a run that stopped for a reason a person must look at:
-authorisation or quota errors, or the allowance cap of the config.
+authorisation or quota errors, or the allowance cap of the config. A config with a
+"gate_file" is not started until that file exists; Study 2 uses this to wait for the
+public registration of its analysis plan.
 """
 import glob
 import json
@@ -26,41 +28,32 @@ RAW = os.path.join(ROOT, "data", "raw")
 SUP_PID = os.path.join(RAW, "supervisor.pid")
 SUP_LOG = os.path.join(RAW, "supervisor.log")
 MAX_RESTARTS = 5
+MAX_PARALLEL = 10   # runs alive at the same time
 BLOCKERS = ("authorisation or quota error", "allowance cap reached")
 
 
+from .status import gate_missing, read_run, total_cells  # noqa: E402
+
+GROUPS = ("final", "study2")
+
+
 def configs():
+    """Configs that belong to a study (pilot and technical tests are run by hand)."""
     out = []
-    for path in sorted(glob.glob(os.path.join(ROOT, "configs", "final_*.json"))):
+    for path in sorted(glob.glob(os.path.join(ROOT, "configs", "*.json"))):
         cfg = json.load(open(path))
-        if isinstance(cfg, dict) and "run_id" in cfg and "models" in cfg:
+        if isinstance(cfg, dict) and "run_id" in cfg and "models" in cfg and cfg.get("group") in GROUPS:
             out.append((path, cfg))
     return out
 
 
-def total_cells(cfg):
-    per_model = len(cfg["mpcrs"]) * len(cfg["variants"]) * cfg["reps"] + len(cfg["mpcrs"]) * cfg.get("comprehension_reps", 0) * 2
-    return per_model * len(cfg["models"])
-
-
 def done_cells(cfg):
-    path = os.path.join(RAW, cfg["run_id"] + ".jsonl")
-    keys = set()
-    if os.path.exists(path):
-        with open(path) as f:
-            for line in f:
-                try:
-                    r = json.loads(line)
-                except json.JSONDecodeError:
-                    continue
-                if r.get("valid") or r.get("attempt", 1) >= 2:
-                    keys.add(r["key"])
-    return len(keys)
+    return len(read_run(cfg)["done"])
 
 
 def run_pid(path):
     """PID of the live runner for this config, or None."""
-    out = subprocess.run(["pgrep", "-af", "pgg.run_oneshot"], capture_output=True, text=True).stdout
+    out = subprocess.run(["pgrep", "-af", "pgg.run_"], capture_output=True, text=True).stdout
     name = os.path.basename(path)
     for line in out.splitlines():
         parts = line.split()
@@ -86,7 +79,8 @@ def blocker(cfg):
 def start_run(path, cfg):
     log = open(os.path.join(RAW, cfg["run_id"] + ".log"), "a")
     subprocess.Popen(
-        [sys.executable, "-m", "pgg.run_oneshot", os.path.relpath(path, ROOT)],
+        [sys.executable, "-m", "pgg.run_repeated" if cfg.get("runner") == "repeated" else "pgg.run_oneshot",
+         os.path.relpath(path, ROOT)],
         cwd=ROOT, stdout=log, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, start_new_session=True,
     )
 
@@ -114,6 +108,7 @@ def supervise():
     try:
         while True:
             pending = 0
+            running = sum(1 for path, _ in configs() if run_pid(path))
             for path, cfg in configs():
                 rid = cfg["run_id"]
                 if done_cells(cfg) >= total_cells(cfg):
@@ -121,11 +116,21 @@ def supervise():
                 if run_pid(path):
                     pending += 1
                     continue
+                if gate_missing(cfg):
+                    if restarts.get(rid) != "gated":
+                        note(f"{rid}: waiting for the public registration file {gate_missing(cfg)}")
+                        restarts[rid] = "gated"
+                    continue
+                if restarts.get(rid) == "gated":
+                    restarts.pop(rid)
                 why = blocker(cfg)
                 if why:
                     if restarts.get(rid) != "blocked":
                         note(f"{rid}: NOT restarted, needs attention: {why}")
                         restarts[rid] = "blocked"
+                    continue
+                if running >= MAX_PARALLEL:
+                    pending += 1
                     continue
                 n = restarts.get(rid, 0)
                 if n > MAX_RESTARTS:
@@ -136,6 +141,7 @@ def supervise():
                 start_run(path, cfg)
                 note(f"{rid}: {'started' if n == 0 else f'restarted ({n})'} at {done_cells(cfg)}/{total_cells(cfg)} cells")
                 restarts[rid] = n + 1
+                running += 1
                 pending += 1
                 time.sleep(2)  # stagger the starts
             if pending == 0:
@@ -171,7 +177,7 @@ def main(argv):
         stop_all()
         return
     if not configs():
-        print("No hay configuraciones configs/final_*.json")
+        print("No hay configuraciones de estudio en configs/")
         return
     if supervisor_pid():
         print(f"El supervisor ya está activo (pid {supervisor_pid()}).")

@@ -21,7 +21,7 @@ BAR = 20
 def alive_runs():
     """{config file name: pid} for live run_oneshot processes."""
     try:
-        out = subprocess.run(["pgrep", "-af", "pgg.run_oneshot"], capture_output=True, text=True).stdout
+        out = subprocess.run(["pgrep", "-af", "pgg.run_"], capture_output=True, text=True).stdout
     except FileNotFoundError:
         return {}
     procs = {}
@@ -44,9 +44,32 @@ def supervisor():
         return None
 
 
+def is_repeated(cfg):
+    return cfg.get("runner") == "repeated"
+
+
+def calls_per_cell(cfg):
+    """A cell is one decision (one-shot runs) or one game (repeated runs)."""
+    if not is_repeated(cfg):
+        return 1
+    n_llm = cfg["n"] if cfg.get("composition", "homogeneous") == "homogeneous" else cfg["n"] - 1
+    return n_llm * cfg["rounds"]
+
+
 def total_cells(cfg):
+    if is_repeated(cfg):
+        return len(cfg["variants"]) * cfg["groups"] * len(cfg["models"])
     per_model = len(cfg["mpcrs"]) * len(cfg["variants"]) * cfg["reps"] + len(cfg["mpcrs"]) * cfg.get("comprehension_reps", 0) * 2
     return per_model * len(cfg["models"])
+
+
+def gate_missing(cfg):
+    """Path of the registration file a run waits for, if it is required and absent."""
+    gate = cfg.get("gate_file")
+    if not gate:
+        return None
+    path = os.path.normpath(os.path.join(ROOT, gate))
+    return None if os.path.exists(path) else path
 
 
 def bar(done, total):
@@ -64,7 +87,8 @@ def hms(seconds):
 
 def read_run(cfg):
     path = os.path.join(RAW, cfg["run_id"] + ".jsonl")
-    d = {"rows": 0, "invalid": 0, "fails": 0, "retried": 0, "allowance": 0.0, "ts": [], "done": set(), "last": None}
+    d = {"rows": 0, "invalid": 0, "fails": 0, "retried": 0, "allowance": 0.0, "ts": [], "done": set(), "last": None,
+         "discarded": set()}
     if os.path.exists(path):
         with open(path) as f:
             for line in f:
@@ -72,6 +96,21 @@ def read_run(cfg):
                     r = json.loads(line)
                 except json.JSONDecodeError:
                     continue  # line still being written
+                if "game_status" in r:               # repeated game: a cell is a finished game
+                    d["done"].add(r["key"])
+                    if r.get("game_status") == "discarded":
+                        d["discarded"].add(r["key"])
+                    if r.get("agent_type") != "llm":
+                        continue
+                    d["rows"] += 1
+                    d["allowance"] += (((r.get("usage") or {}).get("opencode") or {}).get("allowance") or 0)
+                    d["ts"].append(r["ts"])
+                    d["last"] = r
+                    if r.get("transport_retries"):
+                        d["retried"] += 1
+                    if not r.get("valid"):
+                        d["invalid"] += 1
+                    continue
                 d["rows"] += 1
                 d["allowance"] += (((r.get("usage") or {}).get("opencode") or {}).get("allowance") or 0)
                 d["ts"].append(r["ts"])
@@ -111,24 +150,25 @@ def snapshot():
     lines = [f"Estado de las corridas   {time.strftime('%Y-%m-%d %H:%M:%S')}",
              f"Supervisor: {'activo (pid %d), reinicia corridas caídas' % sup if sup else 'no activo'}", ""]
 
-    final = [(n, c, d) for n, c, d in runs if c.get("group") == "final"]
-    if final:
-        tot = sum(total_cells(c) for _, c, _ in final)
-        done = sum(len(d["done"]) for _, _, d in final)
-        recent = sum(1 for _, _, d in final for t in d["ts"] if now - t <= 120)
-        spent = sum(d["allowance"] for _, _, d in final)
-        n_alive = sum(1 for n, _, _ in final if n in alive)
-        lines.append(f"CORRIDA FINAL  {bar(done, tot)}  {done}/{tot} celdas   {n_alive} de {len(final)} procesos activos")
+    names = {"final": "ESTUDIO 1 (final)", "study2": "ESTUDIO 2"}
+    for grp in [g for g in ("final", "study2") if any(c.get("group") == g for _, c, _ in runs)]:
+        part = [(n, c, d) for n, c, d in runs if c.get("group") == grp]
+        tot = sum(total_cells(c) * calls_per_cell(c) for _, c, _ in part)
+        done = sum(len(d["done"]) * calls_per_cell(c) for _, c, d in part)
+        recent = sum(1 for _, _, d in part for t in d["ts"] if now - t <= 120)
+        spent = sum(d["allowance"] for _, _, d in part)
+        n_alive = sum(1 for n, _, _ in part if n in alive)
+        lines.append(f"{names[grp]:18} {bar(done, tot)}  {done}/{tot} llamadas   {n_alive} de {len(part)} procesos activos")
         lines.append(f"  ritmo total {recent / 2:.0f} llamadas/min (últimos 2 min)   cuota usada {spent:.4f} USD")
         lines.append("")
 
-    lines.append(f"{'corrida':34} {'estado':10} {'avance':28} {'celdas':>11} {'/min':>5} {'falta':>7} {'inv':>4} {'reint':>5} {'fallos':>6}  última fila")
+    lines.append(f"{'corrida':34} {'estado':10} {'avance':28} {'celdas*':>11} {'/min':>5} {'falta':>7} {'inv':>4} {'reint':>5} {'fallos':>6}  última fila")
     warnings, etas = [], []
     for name, cfg, d in runs:
         tot, done, pid = total_cells(cfg), len(d["done"]), alive.get(name)
         recent = d["ts"][-30:]
         rate = (len(recent) - 1) / (recent[-1] - recent[0]) if len(recent) > 1 and recent[-1] > recent[0] else None
-        eta = (tot - done) / rate if rate and pid else None
+        eta = (tot - done) * calls_per_cell(cfg) / rate if rate and pid else None
         idle = now - d["ts"][-1] if d["ts"] else None
         if pid:
             state = "corriendo"
@@ -140,8 +180,12 @@ def snapshot():
             state = "DETENIDA"
             tail = " | ".join(log_tail(cfg["run_id"]))
             warnings.append(f"{cfg['run_id']}: detenida en {done}/{tot}. Último mensaje: {tail[:150]}")
+        elif gate_missing(cfg):
+            state = "bloqueada"
         else:
             state = "pendiente"
+        if d["discarded"]:
+            warnings.append(f"{cfg['run_id']}: {len(d['discarded'])} grupos descartados por dos respuestas inválidas")
         if pid and idle and idle > 300:
             warnings.append(f"{cfg['run_id']}: {hms(idle)} sin filas nuevas (reintentos o llamada colgada)")
         if d["fails"]:
@@ -159,6 +203,10 @@ def snapshot():
         lines += ["", "Supervisor, últimos eventos:"] + ["  " + x for x in tail]
     if warnings:
         lines += ["", "AVISOS:"] + ["  " + w for w in warnings]
+    if any(gate_missing(c) for _, c, _ in runs):
+        lines += ["", "Las corridas 'bloqueada' esperan el registro público del plan de análisis:",
+                  "  " + next(gate_missing(c) for _, c, _ in runs if gate_missing(c))]
+    lines += ["", "* celda = una decisión (una ronda) o un juego completo (juego repetido)"]
     if not runs:
         lines.append("No hay configuraciones de corrida en configs/.")
     return "\n".join(lines)

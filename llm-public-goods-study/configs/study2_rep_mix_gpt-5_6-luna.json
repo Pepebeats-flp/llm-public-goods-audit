@@ -1,0 +1,25 @@
+{
+  "n": 4,
+  "endowment": 20,
+  "temperature": 1.0,
+  "min_interval": 1.5,
+  "group": "study2",
+  "gate_file": "../paper_ssc2027/OSF_REGISTRATION.txt",
+  "runner": "repeated",
+  "mpcr": 0.4,
+  "rounds": 10,
+  "run_id": "study2_rep_mix_gpt-5_6-luna",
+  "models": [
+    {
+      "model": "gpt-5.6-luna",
+      "effort": "none"
+    }
+  ],
+  "variants": [
+    "P0"
+  ],
+  "groups": 15,
+  "composition": "one_selfish",
+  "max_allowance_usd": 1.0,
+  "seed": 2027600
+}

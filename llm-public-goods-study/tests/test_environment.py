@@ -146,5 +146,80 @@ class TestRuleAgents(unittest.TestCase):
         self.assertEqual(runs[0], runs[1])
 
 
+class TestRepeatedGame(unittest.TestCase):
+    """Study 2, part B: prompts and runner of the repeated game."""
+
+    def setUp(self):
+        from pgg.prompts import REPEATED_VARIANTS, repeated_prompt
+        from pgg.run_repeated import play_game
+        self.variants, self.prompt, self.play = REPEATED_VARIANTS, repeated_prompt, play_game
+        self.g = Game(4, 20, 1.6)
+
+    def test_prompt_states_rule_and_history(self):
+        hist = [{"round": 1, "own": 10, "others_mean": 20 / 3, "payoff": self.g.payoffs([10, 20, 0, 0])[0]}]
+        for v in self.variants:
+            text, conv = self.prompt(v, self.g, 10, 2, hist)
+            for token in ("1.6", "20", "10 rounds", "round 2 of 10", '"amount"', "6.7", "22"):
+                self.assertIn(token, text, msg=f"{v}: {token}")
+            self.assertEqual(conv(7), 7)
+            first, _ = self.prompt(v, self.g, 10, 1, [])
+            self.assertIn("No rounds have been played yet.", first)
+
+    def test_recorded_payoffs_match_engine(self):
+        """Every recorded payoff and others' mean equals the engine's value for that round's profile."""
+        rng = random.Random(3)
+        plan = [[rng.randint(0, 20) for _ in range(4)] for _ in range(6)]
+        calls = {"n": 0}
+
+        def decide(seat, prompt):
+            t = calls["n"] // 4
+            calls["n"] += 1
+            return plan[t][seat], [{"valid": True, "attempt": 1, "contribution": plan[t][seat]}]
+
+        status, rows = self.play(self.g, 6, ["llm"] * 4, "P0", decide)
+        self.assertEqual(status, "complete")
+        self.assertEqual(len(rows), 24)
+        for r in rows:
+            profile = plan[r["round"] - 1]
+            self.assertEqual(r["contribution"], profile[r["seat"]])
+            self.assertAlmostEqual(r["payoff"], self.g.payoffs(profile)[r["seat"]])
+            self.assertAlmostEqual(r["others_mean"], (sum(profile) - profile[r["seat"]]) / 3)
+            self.assertEqual(r["round_total"], sum(profile))
+
+    def test_agents_see_only_their_own_history(self):
+        seen = {}
+
+        def decide(seat, prompt):
+            seen.setdefault(seat, []).append(prompt)
+            return [0, 5, 10, 20][seat], [{"valid": True, "attempt": 1, "contribution": [0, 5, 10, 20][seat]}]
+
+        status, rows = self.play(self.g, 3, ["llm"] * 4, "P0", decide)
+        self.assertEqual(status, "complete")
+        pay = self.g.payoffs([0, 5, 10, 20])
+        for seat, own in enumerate([0, 5, 10, 20]):
+            others = (35 - own) / 3
+            line = f"Round 1: you placed {own}, the others placed {others:.1f}".rstrip("0").rstrip(".")
+            self.assertIn(line, seen[seat][1])
+            self.assertIn(f"{pay[seat]:.2f}".rstrip("0").rstrip("."), seen[seat][1])
+            self.assertEqual(seen[seat][2].count("Round "), 2)
+
+    def test_neutral_repeated_prompt_avoids_loaded_words(self):
+        text = self.prompt("P0", self.g, 10, 1, [])[0].lower()
+        for word in ("public", "cooperat", "contribut", "game", "invest", "team", "group", "fair"):
+            self.assertNotIn(word, text)
+
+    def test_one_selfish_seat_and_discard_rules(self):
+        status, rows = self.play(self.g, 4, ["llm", "llm", "llm", "selfish"], "P0",
+                                 lambda seat, prompt: (20, [{"valid": True, "attempt": 1}]))
+        self.assertEqual(status, "complete")
+        self.assertTrue(all(r["contribution"] == 0 for r in rows if r["agent_type"] == "selfish"))
+        self.assertAlmostEqual(next(r["payoff"] for r in rows if r["agent_type"] == "selfish"), 20 + 1.6 * 60 / 4)
+        # two invalid outputs discard the group; a transport failure abandons it
+        bad = lambda seat, prompt: (None, [{"valid": False, "attempt": 1}, {"valid": False, "attempt": 2}])
+        self.assertEqual(self.play(self.g, 4, ["llm"] * 4, "P0", bad)[0], "discarded")
+        down = lambda seat, prompt: (None, [{"valid": False, "attempt": 1, "transport_failed": True}])
+        self.assertEqual(self.play(self.g, 4, ["llm"] * 4, "P0", down)[0], "transport_failed")
+
+
 if __name__ == "__main__":
     unittest.main()
