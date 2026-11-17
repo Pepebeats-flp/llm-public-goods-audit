@@ -49,9 +49,13 @@ Collecting new data requires an OpenAI-compatible endpoint and key; see `llm-pub
 - Models were accessed through an intermediary provider (OpenCode Go). The served model identifier is recorded as reported by the provider.
 - The reasoning arm used the baseline prompt only.
 
+## Authors
+
+José Pinto-Muñoz and Sofía Herrera-Henríquez, Universidad Técnica Federico Santa María, Chile.
+
 ## Use of AI tools
 
-The language models listed in the manuscript are the object of study. In addition, an AI coding assistant (Claude, Anthropic) was used to write the experimental and analysis code, to run the analysis and to draft and revise the text. The authors are responsible for the content.
+An AI coding assistant (Claude, Anthropic) was used to write the code, run the analysis, and draft and revise the text. The authors take full responsibility for the content.
 
 ## License
 

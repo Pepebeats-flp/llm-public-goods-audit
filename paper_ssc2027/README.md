@@ -39,8 +39,8 @@ pdflatex paper && bibtex paper && pdflatex paper && pdflatex paper
 
 ## Qué falta para enviar
 
-1. **Autoría y enlaces: puestos el 17-11-2026.** Faltan el correo de contacto y la declaración de intereses, marcados en rojo. Verificar la grafía de los nombres de los autores.
-2. **Repositorio:** creado en GitHub como privado (`Pepebeats-flp/llm-public-goods-audit`). Hay que hacerlo público antes de enviar, porque el paper lo cita.
+1. **Autoría, correos, enlace al repositorio y declaraciones: completos (17-11-2026).** No quedan marcadores pendientes en el paper.
+2. **Repositorio público:** https://github.com/Pepebeats-flp/llm-public-goods-audit
 3. **Citas de Edmonds (SSC 2025) y de Li y Wu (2025):** por decisión del autor (17-11-2026) se mantienen apoyadas en sus abstracts, sin leer el texto completo. Las frases del paper reproducen lo que dicen esos abstracts. Kořínek y Štekerová (2026) y Kitadai et al. (2025) sí se leyeron completos y se verificaron.
 4. **Cifras humanas: cotejadas el 17-11-2026.** El paper cita dos valores verificados en la fuente leída (unos 50 puntos por unidad en Isaac y Walker, versión publicada; unos 25 en Gächter y Marino Fages, documento de trabajo IZA 16605, que es la versión que se cita) y usa a Zelmer solo para la dirección del efecto. No se pudo obtener la versión publicada de Zelmer (cerrada) ni la de JEBO (el servidor rechaza descargas automáticas). Detalle en la sección 0b del log.
 5. **Confirmar con el CFP de febrero de 2027:** límite de páginas, si las referencias cuentan, anonimato, track y política de uso de IA.
