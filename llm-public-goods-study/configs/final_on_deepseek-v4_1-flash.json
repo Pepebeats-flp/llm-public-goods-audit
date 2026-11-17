@@ -1,0 +1,29 @@
+{
+  "n": 4,
+  "endowment": 20,
+  "mpcrs": [
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.75,
+    1.25
+  ],
+  "temperature": 1.0,
+  "min_interval": 1.5,
+  "run_id": "final_on_deepseek-v4_1-flash",
+  "group": "final",
+  "models": [
+    {
+      "model": "deepseek-v4.1-flash",
+      "effort": "high"
+    }
+  ],
+  "variants": [
+    "P0"
+  ],
+  "reps": 50,
+  "comprehension_reps": 10,
+  "max_allowance_usd": 1.5,
+  "seed": 2027203
+}

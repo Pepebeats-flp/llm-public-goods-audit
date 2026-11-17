@@ -1,0 +1,300 @@
+{
+  "_meta": {
+    "stage": "1 - Outline (PaperOrchestra schema, adapted to SSC 2027 / Springer LNCS)",
+    "inputs": [
+      "raw_materials/idea.md",
+      "raw_materials/experimental_log.md",
+      "templates/ssc2027_lncs/template.tex",
+      "templates/ssc2027_lncs/guidelines.md"
+    ],
+    "page_budget_total": 12,
+    "note": "Sections 5-7 depend on experimental_log.md, which is empty. They are planned here but must not be written with numbers until the log is filled.",
+    "executed_scope_note": "Sections were written for the one-shot scope only (E1, E2, reasoning arm). Planned figures fig_mixed_population_welfare and fig_conditional_cooperation_profiles and section_plan items 5.3-5.4 were not produced; see raw_materials/idea.md note and preregistration.md."
+  },
+  "plotting_plan": [
+    {
+      "figure_id": "fig_incentive_response_curves",
+      "title": "Incentive-response curves by model",
+      "plot_type": "plot",
+      "data_source": "experimental_log.md",
+      "objective": "Line chart with 95% CI: mean contribution share against MPCR (0.2, 0.3, 0.4, 0.5, 0.75, 1.25) per model; shaded out-of-dilemma controls; reference lines for the Nash prediction and the human range. Shows H1a and H1b at a glance.",
+      "aspect_ratio": "3:2"
+    },
+    {
+      "figure_id": "fig_variance_decomposition",
+      "title": "Variance decomposition of contributions",
+      "plot_type": "plot",
+      "data_source": "experimental_log.md",
+      "objective": "Stacked horizontal bar per model: share of variance from incentive, paraphrase, framing and seed. Carries the headline signal-to-noise result.",
+      "aspect_ratio": "16:9"
+    },
+    {
+      "figure_id": "fig_mixed_population_welfare",
+      "title": "Welfare and payoff by agent type in mixed populations",
+      "plot_type": "plot",
+      "data_source": "experimental_log.md",
+      "objective": "Grouped bars: welfare per agent and mean payoff of LLM versus rule agents across compositions.",
+      "aspect_ratio": "16:9"
+    },
+    {
+      "figure_id": "fig_conditional_cooperation_profiles",
+      "title": "Conditional-cooperation schedules",
+      "plot_type": "plot",
+      "data_source": "experimental_log.md",
+      "objective": "Line chart: own contribution against others' mean contribution from the strategy method, per model, with the 45-degree line.",
+      "aspect_ratio": "1:1"
+    }
+  ],
+  "intro_related_work_plan": {
+    "introduction_strategy": {
+      "hook_hypothesis": "LLMs are being adopted as agent decision rules in ABMs, and the social simulation community regards validating that practice as its central open problem.",
+      "problem_gap_hypothesis": "No study tests, in an N-player public goods game and with current models, whether LLM contributions track the payoff parameter and stay stable under payoff-equivalent rewording. Scope strictly to the linear public goods game with N = 4 and the models in experimental_log.md.",
+      "search_directions": [
+        "Reviews of LLM use in agent-based modelling and their validation practices (done: larooij2026validation, vanhee2026llmabm, edmonds2026when, zhao2026mechanism, liwu2025letitgo)",
+        "Foundational experimental evidence on linear public goods games (done: ledyard1995public, isaac1988group, zelmer2003meta, fischbacher2010social, fischbacher2001conditional, andreoni1995warm)",
+        "Primary sources for the Smith framing and one behavioural-economics reading (done: smith1776wealth, smith1759moral, ashraf2005smith, vsmith1998two, samuelson1954pure)"
+      ],
+      "citation_candidates": [
+        "vanhee2026llmabm",
+        "larooij2026validation",
+        "edmonds2026when",
+        "ledyard1995public",
+        "smith1776wealth",
+        "smith1759moral",
+        "samuelson1954pure",
+        "huang2025gama",
+        "li2025spontaneous"
+      ]
+    },
+    "related_work_strategy": {
+      "overview": "Three clusters, each ending in the limitation that the present design addresses.",
+      "subsections": [
+        {
+          "subsection_title": "2.1 LLM agents in public goods and other social dilemmas",
+          "methodology_cluster": "Behavioural experiments with LLM players",
+          "sota_investigation_mission": "Describe design parameters (N, endowment, multiplier, action space, prompt context, models, repetitions) of each public goods study and what was varied. Summarise in Table 1.",
+          "limitation_hypothesis": "Single payoff configuration and single context-laden prompt; the only multiplier sweep uses GPT-3.5 with one run per variant and never leaves the dilemma range.",
+          "bridge_to_our_method": "Sweep of MPCR with out-of-dilemma controls across current model families, with enough replications for intervals.",
+          "citation_candidates": [
+            "huang2025gama",
+            "li2025spontaneous",
+            "sreedhar2025simulating",
+            "mei2024turing",
+            "akata2025playing",
+            "pal2026llm",
+            "piatti2024govsim",
+            "gupta2026social",
+            "vallinder2025cultural",
+            "han2025static"
+          ]
+        },
+        {
+          "subsection_title": "2.2 Framing, prompt sensitivity and strategic-reasoning benchmarks",
+          "methodology_cluster": "Context manipulation and game-theoretic evaluation",
+          "sota_investigation_mission": "Report how structure and context were separated statistically and which manipulations were paraphrase versus framing.",
+          "limitation_hypothesis": "Manipulations change scenario content; paraphrase noise is not measured separately; consistency is judged qualitatively.",
+          "bridge_to_our_method": "Factorial design that separates payoff-equivalent paraphrases from framings and decomposes variance.",
+          "citation_candidates": [
+            "lore2024strategic",
+            "korinek2026words",
+            "pal2026llm",
+            "akata2025playing",
+            "fan2024rational",
+            "jia2025strategic",
+            "sun2025survey",
+            "andreoni1995warm"
+          ]
+        },
+        {
+          "subsection_title": "2.3 Validation of generative agent-based models",
+          "methodology_cluster": "Methodological critique within social simulation",
+          "sota_investigation_mission": "State the validation requirements proposed and the documented weaknesses of current practice.",
+          "limitation_hypothesis": "Requirements are stated but few studies supply decision-rule-level audits against external evidence.",
+          "bridge_to_our_method": "A decision-rule audit with external grounding in human experiments and explicit robustness analysis.",
+          "citation_candidates": [
+            "larooij2026validation",
+            "edmonds2026when",
+            "vanhee2026llmabm",
+            "zhao2026mechanism",
+            "liwu2025letitgo",
+            "shi2026llmegta",
+            "gao2025caution",
+            "capraro2025benchmark",
+            "filippas2024homo",
+            "kitadai2025reasoning"
+          ]
+        }
+      ]
+    }
+  },
+  "section_plan": [
+    {
+      "section_title": "Abstract",
+      "target_words": 200,
+      "subsections": [
+        {
+          "subsection_title": "Abstract Content",
+          "content_bullets": [
+            "Problem: LLMs as decision rules in social simulation; unclear whether choices track incentives or wording.",
+            "Method: audit in the linear public goods game; MPCR sweep inside and outside the dilemma; payoff-equivalent paraphrases versus framings; rule-based baselines; mixed populations.",
+            "Results: one or two sentences, written only after experimental_log.md is filled.",
+            "Contribution: protocol and open artefacts for modellers."
+          ],
+          "citation_hints": []
+        }
+      ]
+    },
+    {
+      "section_title": "1. Introduction",
+      "target_pages": 1.5,
+      "subsections": []
+    },
+    {
+      "section_title": "2. Related Work",
+      "target_pages": 1.75,
+      "subsections": []
+    },
+    {
+      "section_title": "3. Model",
+      "target_pages": 1.5,
+      "subsections": [
+        {
+          "subsection_title": "3.1 The linear public goods game",
+          "content_bullets": [
+            "Formalise payoff with Eq. 1 and welfare with Eq. 2 from idea.md; define MPCR.",
+            "State dominant strategy and social optimum in the dilemma range.",
+            "Introduce the two out-of-dilemma controls and why they separate comprehension from preference.",
+            "Table: reference predictions (Nash; Smith WN V; Smith TMS; human evidence)."
+          ],
+          "citation_hints": [
+            "Ledyard (Public Goods: A Survey of Experimental Research)",
+            "Samuelson (The Pure Theory of Public Expenditure)"
+          ]
+        },
+        {
+          "subsection_title": "3.2 ODD summary",
+          "content_bullets": [
+            "Purpose, entities and state variables, process overview and scheduling, design concepts, initialisation, input data, submodels - one compact paragraph each or a table.",
+            "Point to the full ODD in the repository."
+          ],
+          "citation_hints": [
+            "Grimm et al. (The ODD Protocol ... A Second Update)"
+          ]
+        }
+      ]
+    },
+    {
+      "section_title": "4. Agents and Experimental Design",
+      "target_pages": 2,
+      "subsections": [
+        {
+          "subsection_title": "4.1 Agents",
+          "content_bullets": [
+            "Rule-based baselines from idea.md.",
+            "LLM agent interface: observation, JSON action, validation, handling of invalid outputs.",
+            "Model table from experimental_log.md section 0 (pending)."
+          ],
+          "citation_hints": []
+        },
+        {
+          "subsection_title": "4.2 Prompt conditions",
+          "content_bullets": [
+            "P0 neutral baseline, P1-P3 paraphrases, F1-F3 framings from idea.md.",
+            "Automatic payoff-equivalence check."
+          ],
+          "citation_hints": [
+            "Andreoni (Warm-Glow versus Cold-Prickle)",
+            "Sreedhar et al. (Simulating Cooperative Prosocial Behavior with Multi-Agent LLMs)",
+            "Pal et al. (Large language models instantiate evolutionarily robust strategies of cooperation)"
+          ]
+        },
+        {
+          "subsection_title": "4.3 Experiments and hypotheses",
+          "content_bullets": [
+            "Baseline parameters and their sources (table).",
+            "E1-E5 with the hypothesis each addresses.",
+            "Preregistration."
+          ],
+          "citation_hints": [
+            "Isaac and Walker (Group Size Effects in Public Goods Provision)",
+            "Fischbacher and Gächter (Social Preferences, Beliefs, and the Dynamics of Free Riding)",
+            "Fischbacher, Gächter and Fehr (Are people conditionally cooperative?)"
+          ]
+        },
+        {
+          "subsection_title": "4.4 Measures and analysis",
+          "content_bullets": [
+            "Metrics from idea.md; note that one-shot regret is a rescaling of contribution.",
+            "Variance decomposition and signal-to-noise ratio.",
+            "Unit of analysis and inference."
+          ],
+          "citation_hints": [
+            "Lorè and Heydari (Strategic behavior of large language models and the role of game structure versus contextual framing)",
+            "Zelmer (Linear Public Goods Experiments: A Meta-Analysis)"
+          ]
+        }
+      ]
+    },
+    {
+      "section_title": "5. Results",
+      "target_pages": 3,
+      "subsections": [
+        {
+          "subsection_title": "5.1 Incentive response",
+          "content_bullets": [
+            "Fig. incentive curves; table of slopes, monotonicity, control errors, comprehension. Source: experimental_log.md section 2."
+          ],
+          "citation_hints": []
+        },
+        {
+          "subsection_title": "5.2 Paraphrase versus framing",
+          "content_bullets": [
+            "Fig. variance decomposition; table of signal-to-noise per model. Source: section 3."
+          ],
+          "citation_hints": []
+        },
+        {
+          "subsection_title": "5.3 Mixed populations",
+          "content_bullets": [
+            "Fig. welfare and payoff by type. Source: section 4."
+          ],
+          "citation_hints": []
+        },
+        {
+          "subsection_title": "5.4 Conditional cooperation and repetition",
+          "content_bullets": [
+            "Fig. schedules; type shares against human reference. Source: section 5."
+          ],
+          "citation_hints": []
+        }
+      ]
+    },
+    {
+      "section_title": "6. Discussion",
+      "target_pages": 1,
+      "subsections": [
+        {
+          "subsection_title": "6.1 Which reference do LLM agents resemble?",
+          "content_bullets": [
+            "Return to the Nash / Smith / human table with the observed pattern.",
+            "Implication for simulations used in public decision-making."
+          ],
+          "citation_hints": []
+        },
+        {
+          "subsection_title": "6.2 Guidance for modellers and limitations",
+          "content_bullets": [
+            "When an LLM is a defensible decision rule given the signal-to-noise result.",
+            "Threats to validity from idea.md; scope limited to the game and models tested; no counterfactual claims."
+          ],
+          "citation_hints": []
+        }
+      ]
+    },
+    {
+      "section_title": "7. Conclusion",
+      "target_pages": 0.25,
+      "subsections": []
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+label,rows,failed,retried,invalid_first_attempt,missing_cells,temperature_default,served_models
+claude-haiku-5-5@high,420,0,0,0.0,0.0,0.0,claude-haiku-5-5
+claude-haiku-5-5@none,2640,0,0,0.0,0.0,0.0,claude-haiku-5-5
+deepseek-v4.1-flash@high,420,0,0,0.0,0.0,0.0,deepseek-v4.1-flash
+deepseek-v4.1-flash@none,2640,0,0,0.0,0.0,0.0,deepseek-v4.1-flash
+glm-5.3-flash@high,420,0,0,0.0,0.0,0.0,glm-5.3-flash
+glm-5.3-flash@none,2640,0,0,0.0,0.0,0.0,glm-5.3-flash
+gpt-5.6-luna@none,2640,0,0,0.0,0.0,0.0,gpt-5.6-luna
+hy3@high,420,0,0,0.0,0.0,0.0,hy3
+hy3@none,2640,0,0,0.0,0.0,0.0,hy3
+qwen3.8-flash@high,421,0,2,1.0,0.0,0.0,qwen3.8-flash
+qwen3.8-flash@none,2644,1,2,3.0,0.0,0.0,qwen3.8-flash

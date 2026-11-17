@@ -1,0 +1,58 @@
+PILOTO pilot_20261117 - 2 decisiones por celda. Solo para calibrar; no se usa en los resultados del paper.
+
+file: data/raw/pilot_20261117.jsonl
+rows: 576  cells: 576  decisions: 504  comprehension probes: 72
+allowance used (USD, as reported by provider): 0.0442
+
+== Mean contribution, % of endowment, by MPCR (all prompt variants pooled) ==
+model                           0.2    0.3    0.4    0.5   0.75   1.25   n/cell
+claude-haiku-5-5@none          14.3   28.6   21.4   28.6   28.6   14.3   14-14
+deepseek-v4.1-flash@none       14.3   28.6   28.6   28.6   50.0   64.3   14-14
+glm-5.3-flash@none              7.1   21.4   42.9   42.9   42.9   71.4   14-14
+gpt-5.6-luna@none              14.3   35.7   25.0   42.9   57.1   71.4   14-14
+hy3@none                       21.1   70.7   77.9   67.5   71.4   70.7   14-14
+qwen3.8-flash@none              7.1   45.4   35.7   53.6   25.0   64.3   14-14
+
+== Same, baseline prompt P0 only ==
+claude-haiku-5-5@none           0.0    0.0    0.0    0.0    0.0    0.0
+deepseek-v4.1-flash@none        0.0    0.0    0.0    0.0    0.0    0.0
+glm-5.3-flash@none              0.0    0.0    0.0   50.0    0.0   50.0
+gpt-5.6-luna@none               0.0   50.0    0.0  100.0   50.0  100.0
+hy3@none                        0.0  100.0  100.0   50.0   50.0   50.0
+qwen3.8-flash@none              0.0  100.0    0.0   50.0    0.0    0.0
+
+== Incentive response (all variants pooled) ==
+model                        slope_in_dilemma(pp per unit m)  err_ctrl_r<1(pp)  err_ctrl_m>1(pp)  invalid%  latency_s
+claude-haiku-5-5@none                 5.6                        14.3              85.7         0.0     0.85
+deepseek-v4.1-flash@none             50.3                        14.3              35.7         0.0     3.50
+glm-5.3-flash@none                   35.9                         7.1              28.6         0.0     1.16
+gpt-5.6-luna@none                    59.5                        14.3              28.6         0.0     1.08
+hy3@none                             -4.3                        21.1              29.3         0.0     1.85
+qwen3.8-flash@none                  -39.3                         7.1              35.7         0.0     1.04
+
+== Mean contribution by prompt variant, dilemma range only ==
+model                            P0     P1     P2     P3     F1     F2     F3   sd_paraphrase  sd_framing
+claude-haiku-5-5@none           0.0    0.0    0.0    0.0  100.0   87.5    0.0          0.0       47.1
+deepseek-v4.1-flash@none        0.0   37.5    0.0   87.5   87.5   25.0    0.0         35.9       35.8
+glm-5.3-flash@none             12.5   37.5   12.5   75.0   37.5   87.5    0.0         25.6       33.5
+gpt-5.6-luna@none              50.0   50.0   75.0   25.0    0.0   81.2    0.0         17.7       34.6
+hy3@none                       75.0  100.0   81.2  100.0   46.9  100.0    0.0         11.2       37.1
+qwen3.8-flash@none             37.5   50.0    0.0   84.4    7.5   75.0   25.0         30.2       24.8
+
+== Distribution of contributions (share of valid decisions at focal values) ==
+model                          at 0   at E/2   at E   other
+claude-haiku-5-5@none          77.4     0.0    22.6     0.0
+deepseek-v4.1-flash@none       63.1     2.4    34.5     0.0
+glm-5.3-flash@none             61.9     0.0    38.1     0.0
+gpt-5.6-luna@none              58.3     1.2    40.5     0.0
+hy3@none                       28.6     7.1    56.0     8.3
+qwen3.8-flash@none             57.1     7.1    33.3     2.4
+
+== Comprehension probes: % correct ==
+model                           own_full_others_zero    own_zero_others_full   n
+claude-haiku-5-5@none                          100.0                   100.0   12
+deepseek-v4.1-flash@none                        66.7                    50.0   12
+glm-5.3-flash@none                              83.3                     0.0   12
+gpt-5.6-luna@none                               83.3                     0.0   12
+hy3@none                                        83.3                    16.7   12
+qwen3.8-flash@none                              83.3                     0.0   12

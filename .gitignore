@@ -1,0 +1,11 @@
+.cache/
+__pycache__/
+*.pyc
+# LaTeX build products
+*.aux
+*.log
+*.out
+*.blg
+*.toc
+# runtime files of the supervisor
+llm-public-goods-study/data/raw/supervisor.pid

@@ -1,0 +1,153 @@
+\begin{thebibliography}{10}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+\providecommand{\doi}[1]{https://doi.org/#1}
+
+\bibitem{akata2025playing}
+Akata, E., Schulz, L., Coda-Forno, J., Oh, S.J., Bethge, M., Schulz, E.:
+  Playing repeated games with large language models. Nature Human Behaviour
+  (2025). \doi{10.1038/s41562-025-02172-y}
+
+\bibitem{andreoni1995warm}
+Andreoni, J.: Warm-glow versus cold-prickle: The effects of positive and
+  negative framing on cooperation in experiments. The Quarterly Journal of
+  Economics  \textbf{110}(1),  1--21 (1995). \doi{10.2307/2118508}
+
+\bibitem{ashraf2005smith}
+Ashraf, N., Camerer, C.F., Loewenstein, G.: Adam {S}mith, behavioral economist.
+  Journal of Economic Perspectives  \textbf{19}(3),  131--145 (2005).
+  \doi{10.1257/089533005774357897}
+
+\bibitem{edmonds2026when}
+Edmonds, B.: When can you use {AI} for {ABM}? In: Advances in Social
+  Simulation. Proceedings of the 20th Social Simulation Conference (SSC 2025),
+  pp. 124--136. Springer Proceedings in Complexity, Springer (2026).
+  \doi{10.1007/978-3-032-31712-4_9}
+
+\bibitem{fischbacher2010social}
+Fischbacher, U., G{\"a}chter, S.: Social preferences, beliefs, and the dynamics
+  of free riding in public goods experiments. American Economic Review
+  \textbf{100}(1),  541--556 (2010). \doi{10.1257/aer.100.1.541}
+
+\bibitem{gachter2026oneshot}
+G{\"a}chter, S., Marino~Fages, D.: Using the strategy method and elicited
+  beliefs to explain group size and {MPCR} effects in public good experiments.
+  IZA Discussion Paper 16605, IZA Institute of Labor Economics (2023),
+  published in revised form as: The behavioral structure of one-shot
+  cooperation in small and large groups. J. Econ. Behav. Organ. 252, 107828
+  (2026)
+
+\bibitem{gao2025caution}
+Gao, Y., Lee, D., Burtch, G., Fazelpour, S.: Take caution in using {LLMs} as
+  human surrogates. Proceedings of the National Academy of Sciences
+  \textbf{122} (2025). \doi{10.1073/pnas.2501660122}
+
+\bibitem{grimm2020odd}
+Grimm, V., et~al.: The {ODD} protocol for describing agent-based and other
+  simulation models: A second update to improve clarity, replication, and
+  structural realism. Journal of Artificial Societies and Social Simulation
+  \textbf{23}(2), ~7 (2020). \doi{10.18564/jasss.4259}
+
+\bibitem{huang2025gama}
+Huang, J.t., Li, E.J., Lam, M.H., Liang, T., Wang, W., Yuan, Y., et~al.: How
+  far are we on the decision-making of {LLMs}? {E}valuating {LLMs}' gaming
+  ability in multi-agent environments. In: International Conference on Learning
+  Representations (ICLR) (2025), arXiv:2403.11807
+
+\bibitem{isaac1988group}
+Isaac, R.M., Walker, J.M.: Group size effects in public goods provision: The
+  voluntary contributions mechanism. The Quarterly Journal of Economics
+  \textbf{103}(1),  179--199 (1988). \doi{10.2307/1882648}
+
+\bibitem{kitadai2025reasoning}
+Kitadai, A., Rico~Lugo, S.D., Tsurusaki, Y., Fukasawa, Y., Nishino, N.: Can
+  {AI} with high reasoning ability replicate human-like decision making in
+  economic experiments? Group Decision and Negotiation  (2025).
+  \doi{10.1007/s10726-025-09946-9}
+
+\bibitem{korinek2026words}
+Ko{\v{r}}{\'\i}nek, M., {\v{S}}tekerov{\'a}, K.: Words matter: How prompt
+  framing shapes strategic behaviour in large language models. Journal of Cases
+  on Information Technology  \textbf{28}(1) (2026). \doi{10.4018/JCIT.398628}
+
+\bibitem{larooij2026validation}
+Larooij, M., T{\"o}rnberg, P.: Validation is the central challenge for
+  generative social simulation: a critical review of {LLMs} in agent-based
+  modeling. Artificial Intelligence Review  \textbf{59}, ~15 (2026).
+  \doi{10.1007/s10462-025-11412-6}
+
+\bibitem{ledyard1995public}
+Ledyard, J.O.: Public goods: A survey of experimental research. In: Kagel,
+  J.H., Roth, A.E. (eds.) The Handbook of Experimental Economics, pp. 111--194.
+  Princeton University Press (1995)
+
+\bibitem{li2025spontaneous}
+Li, Y., Shirado, H.: Spontaneous giving and calculated greed in language
+  models. In: Proceedings of the 2025 Conference on Empirical Methods in
+  Natural Language Processing. pp. 5271--5286 (2025).
+  \doi{10.18653/v1/2025.emnlp-main.267}
+
+\bibitem{liwu2025letitgo}
+Li, Z., Wu, Q.: Let it go or control it all? {T}he dilemma of prompt
+  engineering in generative agent-based models. System Dynamics Review
+  \textbf{41}(3),  e70008 (2025). \doi{10.1002/sdr.70008}
+
+\bibitem{lore2024strategic}
+Lor{\`e}, N., Heydari, B.: Strategic behavior of large language models and the
+  role of game structure versus contextual framing. Scientific Reports
+  \textbf{14} (2024). \doi{10.1038/s41598-024-69032-z}
+
+\bibitem{mei2024turing}
+Mei, Q., Xie, Y., Yuan, W., Jackson, M.O.: A {T}uring test of whether {AI}
+  chatbots are behaviorally similar to humans. Proceedings of the National
+  Academy of Sciences  \textbf{121}(9),  e2313925121 (2024).
+  \doi{10.1073/pnas.2313925121}
+
+\bibitem{pal2026llm}
+Pal, S., Mallela, A., Pracher, L., Wei, C., Fu, F., Schnell, S.D., Nowak, M.A.:
+  Large language models instantiate evolutionarily robust strategies of
+  cooperation. PNAS Nexus  (2026). \doi{10.1093/pnasnexus/pgag210}
+
+\bibitem{samuelson1954pure}
+Samuelson, P.A.: The pure theory of public expenditure. The Review of Economics
+  and Statistics  \textbf{36}(4),  387--389 (1954). \doi{10.2307/1925895}
+
+\bibitem{shi2026llmegta}
+Shi, J., Frantz, C.K., Kimmich, C., Siddiki, S., Sarkar, A.: {LLM}-augmented
+  empirical game theoretic simulation for socio-ecological systems. In:
+  Proceedings of the 25th International Conference on Autonomous Agents and
+  Multiagent Systems (AAMAS). pp. 1601--1609 (2026). \doi{10.65109/SEWU4006}
+
+\bibitem{smith1759moral}
+Smith, A.: The Theory of Moral Sentiments. A. Millar, London (1759)
+
+\bibitem{smith1776wealth}
+Smith, A.: An Inquiry into the Nature and Causes of the Wealth of Nations.
+  Methuen, London (1904), ed. E. Cannan. First published 1776
+
+\bibitem{sreedhar2025simulating}
+Sreedhar, K., Cai, A., Ma, J., Nickerson, J.V., Chilton, L.B.: Simulating
+  cooperative prosocial behavior with multi-agent {LLMs}: Evidence and
+  mechanisms for {AI} agents to inform policy decisions. In: Proceedings of the
+  30th International Conference on Intelligent User Interfaces. pp. 1272--1286
+  (2025). \doi{10.1145/3708359.3712149}
+
+\bibitem{vanhee2026llmabm}
+Vanh{\'e}e, L., Borit, M., Siebers, P.O., Cremades, R., Frantz, C., G{\"u}rcan,
+  {\"O}., Kalvas, F., Kera, D., et~al.: Large language models for agent-based
+  modelling: Current and possible uses across the modelling cycle. In: Advances
+  in Social Simulation. Proceedings of the 20th Social Simulation Conference
+  (SSC 2025), pp. 601--619. Springer Proceedings in Complexity, Springer
+  (2026). \doi{10.1007/978-3-032-31712-4_43}
+
+\bibitem{zelmer2003meta}
+Zelmer, J.: Linear public goods experiments: A meta-analysis. Experimental
+  Economics  \textbf{6}(3),  299--310 (2003). \doi{10.1023/A:1026277420119}
+
+\bibitem{zhao2026mechanism}
+Zhao, P., Pham, D.H., Vincent, N.: Mechanism plausibility in generative
+  agent-based modeling. In: Proceedings of the 2026 ACM Conference on Fairness,
+  Accountability, and Transparency (FAccT) (2026).
+  \doi{10.1145/3805689.3812388}
+
+\end{thebibliography}

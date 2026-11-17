@@ -1,0 +1,19 @@
+SHA-256 of the files fixed by the preregistration. Generated 2026-11-17T18:37:26Z, before the first confirmatory call.
+
+cd574789c3feaff943709dba5c58bb9c02ccc612d06cef7e690935d2384c7e78  paper_ssc2027/preregistration.md
+ca0d414e042fb2a5a82c018d671acd6c2cbef8b774899df91dadac725ab45de0  llm-public-goods-study/pgg/prompts.py
+b067e14de2af61b76c41aa2ce1ec3b93bc7060b097897aa97ffb5ff5dede5bcc  llm-public-goods-study/pgg/game.py
+d29e75dd6ce09f3a79994542f74b0011ae4d0a0a3ce8bade4d0861dc941f80e2  llm-public-goods-study/pgg/run_oneshot.py
+fa7ea5034915bad7be4cea8d159938c77cdf806f82243738eab3c5f793ae0e3d  llm-public-goods-study/pgg/llm.py
+2aad997ef9e352197bc529e14398092a90702b073286a7b54b9a16721ee8ac37  llm-public-goods-study/configs/final_off_claude-haiku-5-5.json
+e1954728c946be8891c81f135271f2f6be6a4dd6bbb40f501977106cb0280b40  llm-public-goods-study/configs/final_off_deepseek-v4_1-flash.json
+2fa420ada0d0a75e5ae00d45ddac11493489ad8cb120655584375075664ce909  llm-public-goods-study/configs/final_off_glm-5_3-flash.json
+f631d4f9c6d206a2979d40d2c90478a6fff640b1b109e0017a028bd424512ebc  llm-public-goods-study/configs/final_off_gpt-5_6-luna.json
+9f8007cd4f56b5dcdb0d0f1dafa9863a17b5db340407c16a004e2355f1f09b52  llm-public-goods-study/configs/final_off_hy3.json
+27d49b6d25084437737149a1cd82313bd78a84caa5c4ec48897937eceea11d77  llm-public-goods-study/configs/final_off_qwen3_8-flash.json
+7e5bb6d6133351607523fa05bca26ae6954c6a343ed9d4672b1599c810bdb0d1  llm-public-goods-study/configs/final_on_claude-haiku-5-5.json
+96b232455b2d34e4cc8b6586fb17dd55e714a3089601392e07ba09e1aba34e83  llm-public-goods-study/configs/final_on_deepseek-v4_1-flash.json
+48290f5f95904eee523f53e8b3c28a797056c03d14144ee532c95bca6be92830  llm-public-goods-study/configs/final_on_glm-5_3-flash.json
+0434d917e5e8a20d24837f30dde9962ee28cc0baf3cd147d6069e5546502c9e1  llm-public-goods-study/configs/final_on_hy3.json
+7e402385f9e1fc363d1b03e4cab40aa488bec14873ac1d81813b89f445445388  llm-public-goods-study/configs/final_on_qwen3_8-flash.json
+0913bf00c1ddc1d885a9bd713cc78513b63d66099a06c44ff5a8a6baf7594cdb  llm-public-goods-study/configs/opencode_go_models_snapshot.json
