@@ -28,7 +28,7 @@ RAW = os.path.join(ROOT, "data", "raw")
 SUP_PID = os.path.join(RAW, "supervisor.pid")
 SUP_LOG = os.path.join(RAW, "supervisor.log")
 MAX_RESTARTS = 5
-MAX_PARALLEL = 10   # runs alive at the same time
+MAX_PARALLEL = 18   # runs alive at the same time
 BLOCKERS = ("authorisation or quota error", "allowance cap reached")
 
 

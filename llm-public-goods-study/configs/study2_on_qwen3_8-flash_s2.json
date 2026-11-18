@@ -1,0 +1,44 @@
+{
+  "n": 4,
+  "endowment": 20,
+  "temperature": 1.0,
+  "min_interval": 1.5,
+  "group": "study2",
+  "gate_file": "../paper_ssc2027/OSF_REGISTRATION.txt",
+  "run_id": "study2_on_qwen3_8-flash_s2",
+  "mpcrs": [
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.75,
+    1.25
+  ],
+  "models": [
+    {
+      "model": "qwen3.8-flash",
+      "effort": "high"
+    }
+  ],
+  "variants": [
+    "P0",
+    "P1",
+    "P2",
+    "P4",
+    "P3",
+    "F1",
+    "F2",
+    "F3"
+  ],
+  "reps": 50,
+  "comprehension_reps": 0,
+  "max_allowance_usd": 1.5,
+  "seed": 2027301,
+  "shard": {
+    "index": 2,
+    "of": 4
+  },
+  "also_done_from": [
+    "study2_on_qwen3_8-flash"
+  ]
+}

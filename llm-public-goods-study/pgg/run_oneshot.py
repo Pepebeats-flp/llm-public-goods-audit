@@ -14,6 +14,8 @@ Config keys:
   max_allowance_usd stop when the cumulative allowance reported by the provider reaches this
   min_interval      seconds between requests
   seed              shuffles the order of cells so that time is not confounded with condition
+  shard             optional {"index": i, "of": k}: take every k-th cell of the shuffled list
+  also_done_from    optional list of run ids whose completed cells are not asked again
 
 Rules fixed before running:
   * Transport failures (HTTP 429/5xx, timeouts) are retried up to 3 times with backoff and
@@ -42,6 +44,29 @@ def _done_keys(path):
                 if row.get("valid") or row.get("attempt", 1) >= 2:
                     keys.add(row["key"])
     return keys
+
+
+def build_tasks(cfg):
+    """All tasks of a config in execution order, as (kind, model_cfg, label, mpcr, variant, rep, key).
+
+    A config with "shard": {"index": i, "of": k} takes every k-th task of the shuffled list,
+    so that k processes can share the cells of one model without overlap.
+    """
+    tasks = []
+    for mc in cfg["models"]:
+        label = mc.get("label") or f"{mc['model']}@{mc.get('effort')}"
+        for m in cfg["mpcrs"]:
+            for v in cfg["variants"]:
+                for rep in range(cfg["reps"]):
+                    tasks.append(("decision", mc, label, m, v, rep))
+            for rep in range(cfg.get("comprehension_reps", 0)):
+                for item in (0, 1):
+                    tasks.append(("comprehension", mc, label, m, f"Q{item + 1}", rep))
+    random.Random(cfg.get("seed", 0)).shuffle(tasks)
+    shard = cfg.get("shard")
+    if shard:
+        tasks = tasks[shard["index"]::shard["of"]]
+    return [t + (f"{t[0]}|{t[2]}|{t[3]}|{t[4]}|{t[5]}",) for t in tasks]
 
 
 def _allowance(resp):
@@ -74,24 +99,15 @@ def main(config_path):
     done = _done_keys(out_path)
     client = Client("pgg-" + cfg["run_id"], min_interval=cfg.get("min_interval", 1.5))
 
-    tasks = []
-    for mc in cfg["models"]:
-        label = mc.get("label") or f"{mc['model']}@{mc.get('effort')}"
-        for m in cfg["mpcrs"]:
-            for v in cfg["variants"]:
-                for rep in range(cfg["reps"]):
-                    tasks.append(("decision", mc, label, m, v, rep))
-            for rep in range(cfg.get("comprehension_reps", 0)):
-                for item in (0, 1):
-                    tasks.append(("comprehension", mc, label, m, f"Q{item + 1}", rep))
-    random.Random(cfg.get("seed", 0)).shuffle(tasks)
+    for other in cfg.get("also_done_from", []):      # cells already collected by a run this one continues
+        done |= _done_keys(os.path.join("data", "raw", other + ".jsonl"))
+    tasks = build_tasks(cfg)
 
     spent = 0.0
     cap = cfg.get("max_allowance_usd", 1.0)
     n_new = 0
     with open(out_path, "a") as out:
-        for kind, mc, label, m, v, rep in tasks:
-            key = f"{kind}|{label}|{m}|{v}|{rep}"
+        for kind, mc, label, m, v, rep, key in tasks:
             if key in done:
                 continue
             if spent >= cap:

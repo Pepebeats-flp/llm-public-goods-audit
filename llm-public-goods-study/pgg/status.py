@@ -60,7 +60,9 @@ def total_cells(cfg):
     if is_repeated(cfg):
         return len(cfg["variants"]) * cfg["groups"] * len(cfg["models"])
     per_model = len(cfg["mpcrs"]) * len(cfg["variants"]) * cfg["reps"] + len(cfg["mpcrs"]) * cfg.get("comprehension_reps", 0) * 2
-    return per_model * len(cfg["models"])
+    total = per_model * len(cfg["models"])
+    shard = cfg.get("shard")
+    return len(range(shard["index"], total, shard["of"])) if shard else total
 
 
 def gate_missing(cfg):
@@ -123,6 +125,20 @@ def read_run(cfg):
                     d["invalid"] += 1
                 if r.get("valid") or r.get("attempt", 1) >= 2:
                     d["done"].add(r["key"])
+    if cfg.get("also_done_from"):                    # a shard also counts its cells collected by the run it continues
+        from .run_oneshot import build_tasks
+        mine = {t[-1] for t in build_tasks(cfg)}
+        for other in cfg["also_done_from"]:
+            prev = os.path.join(RAW, other + ".jsonl")
+            if os.path.exists(prev):
+                with open(prev) as f:
+                    for line in f:
+                        try:
+                            r = json.loads(line)
+                        except json.JSONDecodeError:
+                            continue
+                        if r["key"] in mine and (r.get("valid") or r.get("attempt", 1) >= 2):
+                            d["done"].add(r["key"])
     return d
 
 
@@ -176,10 +192,14 @@ def snapshot():
                 etas.append(eta)
         elif tot and done >= tot:
             state = "terminada"
+        elif d["rows"] and cfg.get("superseded"):
+            state = "repartida"
         elif d["rows"]:
             state = "DETENIDA"
             tail = " | ".join(log_tail(cfg["run_id"]))
             warnings.append(f"{cfg['run_id']}: detenida en {done}/{tot}. Último mensaje: {tail[:150]}")
+        elif cfg.get("superseded"):
+            state = "repartida"
         elif gate_missing(cfg):
             state = "bloqueada"
         else:

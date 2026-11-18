@@ -3,7 +3,7 @@
   "endowment": 20,
   "temperature": 1.0,
   "min_interval": 1.5,
-  "group": "study2",
+  "group": "study2_superseded",
   "gate_file": "../paper_ssc2027/OSF_REGISTRATION.txt",
   "run_id": "study2_on_qwen3_8-flash",
   "mpcrs": [
@@ -33,5 +33,6 @@
   "reps": 50,
   "comprehension_reps": 0,
   "max_allowance_usd": 3.0,
-  "seed": 2027301
+  "seed": 2027301,
+  "superseded": true
 }
