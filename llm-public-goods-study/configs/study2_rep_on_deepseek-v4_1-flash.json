@@ -3,7 +3,7 @@
   "endowment": 20,
   "temperature": 1.0,
   "min_interval": 1.5,
-  "group": "study2",
+  "group": "study2_closed",
   "gate_file": "../paper_ssc2027/OSF_REGISTRATION.txt",
   "runner": "repeated",
   "mpcr": 0.4,
@@ -23,5 +23,6 @@
   "groups": 10,
   "composition": "homogeneous",
   "max_allowance_usd": 2.5,
-  "seed": 2027500
+  "seed": 2027500,
+  "closed_incomplete": "Wording F2 not collected: every game was abandoned after transport failures (see paper_ssc2027/deviations_study2.md, item 3)."
 }

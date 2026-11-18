@@ -153,7 +153,9 @@ def main(config_path):
                 if http in (401, 402, 403):
                     print("authorisation or quota error; stopping:", err, flush=True)
                     break
-                print(f"game {key} abandoned after a transport failure; it will be replayed", flush=True)
+                last = next((r for r in reversed(rows) if r.get("transport_failed")), {})
+                print(f"game {key} abandoned in round {last.get('round')} after a transport failure "
+                      f"(http {http}, {str(err)[:200]!r}); it will be replayed", flush=True)
                 continue
             for r in rows:
                 r.update(key=key, run_id=cfg["run_id"], kind="repeated_decision", label=label, model=mc["model"],

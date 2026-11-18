@@ -194,12 +194,16 @@ def snapshot():
             state = "terminada"
         elif d["rows"] and cfg.get("superseded"):
             state = "repartida"
+        elif d["rows"] and cfg.get("closed_incomplete"):
+            state = "cerrada"
         elif d["rows"]:
             state = "DETENIDA"
             tail = " | ".join(log_tail(cfg["run_id"]))
             warnings.append(f"{cfg['run_id']}: detenida en {done}/{tot}. Último mensaje: {tail[:150]}")
         elif cfg.get("superseded"):
             state = "repartida"
+        elif cfg.get("closed_incomplete"):
+            state = "cerrada"
         elif gate_missing(cfg):
             state = "bloqueada"
         else:
