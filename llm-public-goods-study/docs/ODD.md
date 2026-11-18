@@ -83,6 +83,18 @@ None. The model metadata recorded for documentation (`configs/opencode_go_models
 
 **7.5 Rule-based agents.** `pgg/agents.py` contains selfish, cooperative, reciprocal and adaptive agents and a repeated-game loop. They are used only in the environment tests; they are not part of the reported experiments.
 
+## Addendum: repeated game (Study 2, part B)
+
+**Scales and scheduling.** Groups of N = 4 agents play T = 10 rounds with a known horizon, E = 20 per round, m = 0.4. Within a round the agents decide in seat order, each without information about the current round. After the last agent has decided, the environment computes payoffs and appends to each agent's history its own contribution, the mean contribution of the other three and its payoff.
+
+**Sensing and memory.** An agent senses the rules, the round number and its own history, all placed in one fresh prompt per decision (`repeated_prompt` in `pgg/prompts.py`). It has no other memory and does not see individual contributions of others. There is no communication.
+
+**Interaction and collectives.** Agents interact only through the shared account. A group is homogeneous (four LLM agents of one model and wording) or mixed (three LLM agents and one rule-based agent that always contributes zero, `Selfish` in `pgg/agents.py`).
+
+**Stochasticity.** Model sampling at temperature 1.0. The order of games is shuffled with a fixed seed.
+
+**Observation.** One row per decision with round, seat, contribution, payoff, mean of the others and round total. A game is written only when it ends (`pgg/run_repeated.py`). A group is discarded if an agent returns two invalid outputs in a round; a game interrupted by a transport failure is not recorded and is played again.
+
 ## Verification
 
-`python3 -m unittest discover -s tests` runs 14 tests covering the payoff rule, regimes and dominant actions (by enumeration), payoff equivalence of the variants, vocabulary of the neutral variants, answer keys of the probes, output parsing and reproducibility of the rule-based agents.
+`python3 -m unittest discover -s tests` runs 19 tests covering the payoff rule, regimes and dominant actions (by enumeration), payoff equivalence of the variants, vocabulary of the neutral variants, answer keys of the probes, output parsing, reproducibility of the rule-based agents, and for the repeated game the prompts, the history shown to each agent, the recorded payoffs and the discard rules.

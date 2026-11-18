@@ -2,26 +2,29 @@
 
 Code, data, preregistration and manuscript source for a study of six large language models used as decision rules in a one-shot linear public goods game.
 
-Each model was asked 2,640 times (reasoning off) how much of an endowment of 20 it places in a shared account, under six values of the marginal per capita return and eight payoff-equivalent or reframed descriptions of the same game. Five models were asked again with reasoning switched on. In total: 17,940 preregistered decisions and comprehension probes, run on 17 November 2026.
+Two studies, run on 17 and 18 November 2026.
+
+- **Study 1.** One-shot decisions: six models, six values of the marginal per capita return, eight payoff-equivalent or reframed descriptions of the same game, 50 decisions per cell without reasoning, plus a reasoning arm on the baseline prompt and comprehension probes. 17,940 cells.
+- **Study 2.** Part A repeats the one-shot design with reasoning on for five models and all eight descriptions (12,000 decisions). Part B is a ten-round game in groups of four agents with feedback (410 games, 15,503 calls).
 
 ## Main results
 
-- Without reasoning, rewording the same game explains 3 to 21 times more variance in contributions than the incentive, in the five models where the ratio is defined.
-- Two of six models respond to the incentive; no model chooses the dominant action in both control conditions.
-- Naming the game lowers contributions, including where contributing everything maximises the agent's own payoff.
-- With reasoning on, four of five models contribute nothing at every value inside the social dilemma.
+- Without reasoning, rewording the same game explains 3 to 21 times more variance in contributions than the incentive, in the five models where the ratio is defined. Two of six models respond to the incentive and none chooses the dominant action in both controls.
+- With reasoning on, three of five models contribute nothing under every wording inside the dilemma. Where contributing is dominant, two models still range over 70 and 82 percentage points across wordings.
+- In the repeated game, the gap between a "Teamwork" label and the named game is still present in round 10 in three of six models and vanishes in the other three.
+- One model answered an identical prompt with the full endowment in 91% of decisions in one batch and in 10% in a batch that began 22 minutes later.
 
 ## Layout
 
 | Path | Content |
 |---|---|
 | `llm-public-goods-study/pgg/` | Game engine, prompt variants, API client, runner, supervisor, analysis and figures |
-| `llm-public-goods-study/tests/` | Environment validation (14 tests) |
+| `llm-public-goods-study/tests/` | Environment validation (19 tests) |
 | `llm-public-goods-study/configs/` | One configuration per model and reasoning setting; snapshot of model metadata |
 | `llm-public-goods-study/data/raw/` | One JSON line per API call: parsed action, returned text, reasoning trace, usage, timing |
 | `llm-public-goods-study/data/processed/` | Tables and the analysis report |
 | `llm-public-goods-study/docs/ODD.md` | Full model description (ODD protocol) |
-| `paper_ssc2027/preregistration.md` | Analysis plan fixed before the confirmatory run, with file hashes in `preregistration_manifest.txt` |
+| `paper_ssc2027/preregistration.md`, `preregistration_study2.md` | Analysis plans of the two studies, with file hashes in the manifests |
 | `paper_ssc2027/raw_materials/experimental_log.md` | Every number used in the manuscript |
 | `paper_ssc2027/latex_writeup/` | Manuscript source (Springer LNCS) and figures |
 | `paper_ssc2027/review/` | Internal review rounds |
@@ -37,21 +40,22 @@ cd llm-public-goods-study
 python3 -m unittest discover -s tests                                # environment validation
 python3 -m pgg.analyze --glob 'data/raw/final_*.jsonl' --tag final   # tables and report (seeded bootstrap)
 python3 -m pgg.extra_aggregates                                      # aggregates quoted in the log
+python3 -m pgg.analyze_study2                                        # Study 2, part A
+python3 -m pgg.analyze_repeated                                      # Study 2, part B
+python3 -m pgg.extra_aggregates_study2
 python3 -m pgg.figures --tag final                                   # figures
 ```
 
 Collecting new data requires an OpenAI-compatible endpoint and key; see `llm-public-goods-study/README.md` (in Spanish) and `pgg/llm.py`.
-
-## Study 2 (registered, not yet run)
-
-A second study completes the reasoning arm with all eight prompt variants and adds a repeated game with interacting agents. Its analysis plan is `paper_ssc2027/preregistration_study2.md`, with file hashes in `preregistration_study2_manifest.txt`. The launcher does not start Study 2 until the public registration URL is recorded in `paper_ssc2027/OSF_REGISTRATION.txt`.
 
 ## Things to know before reusing the data
 
 - The pilot run (`pilot_20261117`) was inspected before the analysis plan was fixed. It is kept for transparency and is excluded from every reported result.
 - The preregistration was not posted to a public registry before the run; the hash manifest was generated before the first confirmatory call.
 - Models were accessed through an intermediary provider (OpenCode Go). The served model identifier is recorded as reported by the provider.
-- The reasoning arm used the baseline prompt only.
+- The plan of Study 2 (`paper_ssc2027/preregistration_study2.md`) was pushed to this repository before its run (commit 28b8b11) but was not registered on OSF. Deviations are listed in `paper_ssc2027/deviations_study2.md`.
+- One cell of Study 2 is missing: deepseek-v4.1-flash with reasoning in the repeated game under the "Teamwork" wording.
+- `techtest_repeated` is a technical test of the repeated-game runner and is excluded from every result.
 
 ## Authors
 

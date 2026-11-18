@@ -1,0 +1,6 @@
+model,slope_pp,p_one_sided,slope_lo,slope_hi,dilemma_mean_pct,ctrl_low_mean_pct,ctrl_low_lo,ctrl_low_hi,ctrl_low_verdict,ctrl_high_mean_pct,ctrl_high_lo,ctrl_high_hi,ctrl_high_verdict,p_holm
+claude-haiku-5-5,1.1731843575418999,0.15930492519990969,0.0,3.5195530726256976,0.125,0.0,0.0,0.0,pass,54.0,47.0,61.0,fail,0.6372197007996387
+deepseek-v4.1-flash,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,pass,99.5,98.5,100.0,pass,1.0
+glm-5.3-flash,9.13407821229052,0.09739416033543924,-4.302374301675979,22.571229050279307,12.4375,2.25,0.5,4.5,pass,73.25,67.0,79.25,fail,0.4869708016771962
+hy3,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,pass,99.5,98.5,100.0,pass,1.0
+qwen3.8-flash,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,pass,93.0,89.0,96.5,inconclusive,1.0

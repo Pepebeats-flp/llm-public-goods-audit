@@ -3,11 +3,6 @@
 \providecommand{\urlprefix}{URL }
 \providecommand{\doi}[1]{https://doi.org/#1}
 
-\bibitem{akata2025playing}
-Akata, E., Schulz, L., Coda-Forno, J., Oh, S.J., Bethge, M., Schulz, E.:
-  Playing repeated games with large language models. Nature Human Behaviour
-  (2025). \doi{10.1038/s41562-025-02172-y}
-
 \bibitem{andreoni1995warm}
 Andreoni, J.: Warm-glow versus cold-prickle: The effects of positive and
   negative framing on cooperation in experiments. The Quarterly Journal of
@@ -36,11 +31,6 @@ G{\"a}chter, S., Marino~Fages, D.: Using the strategy method and elicited
   published in revised form as: The behavioral structure of one-shot
   cooperation in small and large groups. J. Econ. Behav. Organ. 252, 107828
   (2026)
-
-\bibitem{gao2025caution}
-Gao, Y., Lee, D., Burtch, G., Fazelpour, S.: Take caution in using {LLMs} as
-  human surrogates. Proceedings of the National Academy of Sciences
-  \textbf{122} (2025). \doi{10.1073/pnas.2501660122}
 
 \bibitem{grimm2020odd}
 Grimm, V., et~al.: The {ODD} protocol for describing agent-based and other
@@ -97,26 +87,10 @@ Lor{\`e}, N., Heydari, B.: Strategic behavior of large language models and the
   role of game structure versus contextual framing. Scientific Reports
   \textbf{14} (2024). \doi{10.1038/s41598-024-69032-z}
 
-\bibitem{mei2024turing}
-Mei, Q., Xie, Y., Yuan, W., Jackson, M.O.: A {T}uring test of whether {AI}
-  chatbots are behaviorally similar to humans. Proceedings of the National
-  Academy of Sciences  \textbf{121}(9),  e2313925121 (2024).
-  \doi{10.1073/pnas.2313925121}
-
 \bibitem{pal2026llm}
 Pal, S., Mallela, A., Pracher, L., Wei, C., Fu, F., Schnell, S.D., Nowak, M.A.:
   Large language models instantiate evolutionarily robust strategies of
   cooperation. PNAS Nexus  (2026). \doi{10.1093/pnasnexus/pgag210}
-
-\bibitem{samuelson1954pure}
-Samuelson, P.A.: The pure theory of public expenditure. The Review of Economics
-  and Statistics  \textbf{36}(4),  387--389 (1954). \doi{10.2307/1925895}
-
-\bibitem{shi2026llmegta}
-Shi, J., Frantz, C.K., Kimmich, C., Siddiki, S., Sarkar, A.: {LLM}-augmented
-  empirical game theoretic simulation for socio-ecological systems. In:
-  Proceedings of the 25th International Conference on Autonomous Agents and
-  Multiagent Systems (AAMAS). pp. 1601--1609 (2026). \doi{10.65109/SEWU4006}
 
 \bibitem{smith1759moral}
 Smith, A.: The Theory of Moral Sentiments. A. Millar, London (1759)

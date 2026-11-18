@@ -4,19 +4,20 @@ Este directorio aplica la metodología de [PaperOrchestra](https://github.com/go
 
 No se ejecuta el código de Google. Ese código está escrito para papers de conferencias de IA, llama a Gemini u OpenAI y a Semantic Scholar con claves propias, y sus prompts piden el tono de "top-tier ML conference". Aquí se sigue la misma secuencia de etapas y los mismos archivos de entrada y salida, con las reglas de SSC en lugar de las de ICLR o CVPR.
 
-## Etapas y estado (17-11-2026, tras la corrida confirmatoria)
+## Etapas y estado (18-11-2026, con los dos estudios)
 
 | Etapa de PaperOrchestra | Archivo aquí | Estado |
 |---|---|---|
-| Entrada: idea | `raw_materials/idea.md` | Lista (con nota del alcance realmente ejecutado) |
-| Entrada: log experimental | `raw_materials/experimental_log.md` | **Completo**: 17.940 celdas, análisis prerregistrado |
-| Entrada: plantilla y reglas de la sede | `templates/ssc2027_lncs/` | Lista; reglas basadas en SSC 2026, a confirmar con el CFP 2027 |
-| Entrada: figuras | `latex_writeup/figures/`, registro en `raw_materials/figures/info.json` | Tres generadas; el paper usa dos |
-| Prerregistro | `preregistration.md`, `preregistration_manifest.txt` | Escrito y con huellas antes de la corrida; **no subido a un registro público** |
-| 1. Esquema | `outline.json` | Hecho (plan original; ver nota de alcance) |
-| 2. Revisión de literatura | `literature/references.bib` | 38 entradas verificadas; el paper cita 27 |
-| 3. Redacción de secciones | `latex_writeup/paper.tex` → `paper.pdf` | **Completa**, 12 páginas |
-| 4. Refinamiento | `review/review_v0.md`, `review/review_v1.md` | Primera ronda con resultados hecha |
+| Entrada: idea | `raw_materials/idea.md` | Lista (plan original, con nota de alcance) |
+| Entrada: log experimental | `raw_materials/experimental_log.md` | Completo: Estudio 1 (17.940 celdas) y Estudio 2 (12.000 decisiones y 410 juegos) |
+| Entrada: plantilla y reglas de la sede | `templates/ssc2027_lncs/` | Lista; basada en SSC 2025 y 2026, a confirmar con el CFP 2027 |
+| Entrada: figuras | `latex_writeup/figures/` | Cuatro generadas; el paper usa dos |
+| Planes de análisis | `preregistration.md`, `preregistration_study2.md` y sus manifiestos | Estudio 1: público solo después de correr. Estudio 2: público antes de correr, sin OSF |
+| Desviaciones | `deviations_study2.md`, y sección de desviaciones del log | Registradas |
+| 1. Esquema | `outline.json` | Plan original |
+| 2. Revisión de literatura | `literature/references.bib` | 38 entradas verificadas; el paper cita 22 |
+| 3. Redacción | `latex_writeup/paper.tex` → `paper.pdf` | Completa, 12 páginas. La versión de un solo estudio quedó en `paper_v1_study1_only.tex` |
+| 4. Refinamiento | `review/` | Ronda 1 (Estudio 1) y ronda 2 (dos estudios) |
 
 ## Regla central
 

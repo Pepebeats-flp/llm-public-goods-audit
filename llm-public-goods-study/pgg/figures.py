@@ -152,6 +152,40 @@ def fig_variants(tag, out):
     save(fig, out, "fig_prompt_variants")
 
 
+def fig_trajectories(out, tag="study2B"):
+    """Small multiples: mean contribution by round in the repeated game, one line per wording."""
+    d = pd.read_csv(os.path.join(ROOT, "data", "processed", f"{tag}_trajectories.csv"))
+    d = d[d.label.str.endswith("@none") & (d.composition == "homogeneous")]
+    labels = sorted(d.label.unique())
+    series = [("P0", "baseline", BLUE, "o", "-"), ("F2", "\"Teamwork\"", AQUA, "^", (0, (4, 1.5))), ("F3", "named game", ORANGE, "s", (0, (1, 1)))]
+    ncol = 3
+    nrow = -(-len(labels) // ncol)
+    fig, axes = plt.subplots(nrow, ncol, figsize=(WIDTH, 1.5 * nrow), sharex=True, sharey=True, squeeze=False)
+    for ax, lab in zip(axes.flat, labels):
+        for v, name, color, marker, ls in series:
+            g = d[(d.label == lab) & (d.variant == v)].sort_values("round")
+            if g.empty:
+                continue
+            ax.fill_between(g["round"], g.ci_lo, g.ci_hi, color=color, alpha=0.13, lw=0, zorder=2)
+            ax.plot(g["round"], g["mean"], color=color, lw=1.2, ls=ls, marker=marker, ms=2.6, mec="white", mew=0.4, zorder=4)
+        ax.set_title(short(lab), fontsize=7, color=INK, pad=3, loc="left")
+        ax.set_ylim(-4, 104)
+        ax.set_yticks([0, 50, 100])
+        ax.set_xticks([1, 4, 7, 10])
+        ax.grid(axis="y", color=GRID, lw=0.5)
+        ax.set_axisbelow(True)
+    for ax in axes.flat[len(labels):]:
+        ax.set_visible(False)
+    from matplotlib.lines import Line2D
+    handles = [Line2D([], [], color=c, lw=1.2, ls=ls, marker=m, ms=2.8, mec="white", mew=0.4) for _, _, c, m, ls in series]
+    fig.legend(handles, [n for _, n, _, _, _ in series], loc="upper center", ncol=3, frameon=False, fontsize=6.2,
+               handlelength=2.6, columnspacing=1.4, bbox_to_anchor=(0.53, 1.0))
+    fig.supxlabel("round", fontsize=7, color=INK2, y=0.045)
+    fig.supylabel("contribution (% of endowment)", fontsize=7, color=INK2, x=0.02)
+    fig.tight_layout(w_pad=0.8, h_pad=0.9, rect=(0.02, 0.02, 1, 0.95))
+    save(fig, out, "fig_repeated_trajectories")
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--tag", required=True)
@@ -160,3 +194,5 @@ if __name__ == "__main__":
     fig_incentive(a.tag, a.out)
     fig_variance(a.tag, a.out)
     fig_variants(a.tag, a.out)
+    if os.path.exists(os.path.join(ROOT, "data", "processed", "study2B_trajectories.csv")):
+        fig_trajectories(a.out)

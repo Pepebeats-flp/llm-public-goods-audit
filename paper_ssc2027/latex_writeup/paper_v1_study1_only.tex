@@ -1,0 +1,231 @@
+% SSC 2027 full paper draft (Springer LNCS).
+% Every number in Sections 5-6 comes from raw_materials/experimental_log.md.
+\documentclass[runningheads]{llncs}
+
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\renewcommand\UrlFont{\color{blue}\rmfamily}
+
+% Marker for content that waits for a decision of the authors.
+\newcommand{\pending}[1]{\textcolor{red}{[\textsc{pending}: #1]}}
+
+\begin{document}
+
+\title{Incentives or Wording? Auditing LLM Decision Rules in a Public Goods Game}
+\titlerunning{Incentives or Wording? Auditing LLM Decision Rules}
+
+\author{Jos\'e Pinto-Mu\~noz \and Sof\'ia Herrera-Henr\'iquez}
+\authorrunning{J. Pinto-Mu\~noz and S. Herrera-Henr\'iquez}
+\institute{Universidad T\'ecnica Federico Santa Mar\'ia, Chile\\ \email{jose.pintom@usm.cl, sofia.herrerah@usm.cl}}
+
+\maketitle
+
+\begin{abstract}
+Large language models (LLMs) are increasingly used as decision rules for agents in social simulations, yet it is unclear whether their choices follow the incentives encoded in a model or the wording used to describe it. We audit six current fast-tier LLMs in a one-shot linear public goods game with 17,940 preregistered decisions and comprehension probes. We vary the marginal per capita return inside the social dilemma and in two controls where self-interest and collective welfare coincide, and present each game under four payoff-equivalent paraphrases, a version with worked examples, and three framings. Without explicit reasoning, rewording the same game explains 3 to 21 times more variance in contributions than the incentive in five models. The sixth contributes nothing under every neutral wording, even when contributing is the dominant action, and no model chooses the dominant action in both controls. Naming the game and using its standard vocabulary lowers contributions in three models and leaves four of the six at about 4\% or less, including where full contribution maximises the agent's own payoff. With reasoning switched on, four of five models contribute nothing at every dilemma value, as the equilibrium predicts. In this audit, the level of cooperation is set largely by two configuration choices, wording and reasoning mode, and only weakly by the modelled incentives. We release the protocol, prompts and data.
+
+\keywords{Large language models \and Agent-based modelling \and Public goods game \and Validation \and Prompt sensitivity}
+\end{abstract}
+
+\section{Introduction}
+
+Large language models (LLMs) enter agent-based modelling mainly as the decision rule of the agent. In a recent review for this community, 20 of 22 coded studies used the LLM at the implementation stage, as the engine that decides or communicates on the agent's behalf~\cite{vanhee2026llmabm}. A modeller describes a situation in natural language and obtains an action without hand-crafting a behavioural rule.
+
+It is less clear that the action can be trusted. A critical review of generative agent-based models finds that 15 of 35 studies rely solely on subjective assessments for validation and that most draw conclusions from a single run~\cite{larooij2026validation}. Edmonds argues that neither the plausibility of LLM output nor clever prompting is sufficient, and that one needs to check that the system behaves reliably for the modelling purpose~\cite{edmonds2026when}. Prompt design can itself predetermine outcomes that are later reported as emergent~\cite{liwu2025letitgo}.
+
+We carry out such a check for one well-understood situation and ask two things of an LLM used as a decision rule. When the modeller changes a payoff parameter, does the action change in a direction that theory or evidence predicts? When the modeller rewrites the description without changing the payoffs, does the action stay the same? If wording moves behaviour more than incentives do, the simulation reports the modeller's phrasing instead of the modelled mechanism.
+
+The linear public goods game suits this audit because it offers independent references. In the Nash equilibrium of the one-shot game nobody contributes. In laboratory experiments people contribute between 40 and 60 percent of their endowment at first and contribute more when the return on contributions is higher~\cite{ledyard1995public,zelmer2003meta,isaac1988group}. A third reference is Adam Smith. The game is often introduced as a case where his invisible hand fails, but Smith did not expect it to work there. He assigned to the sovereign those public works which, ``though they may be in the highest degree advantageous to a great society, are, however, of such a nature that the profit could never repay the expence to any individual or small number of individuals''~\cite[V.i.c]{smith1776wealth}. On voluntary provision Smith and Nash agree. The contrasting prediction comes from Smith's other book, which opens by stating that however selfish man may be supposed, ``there are evidently some principles in his nature, which interest him in the fortune of others''~\cite[I.i.1]{smith1759moral}, and which behavioural economists read as anticipating other-regarding behaviour in laboratory games~\cite{ashraf2005smith}. Human subjects fall between the two. We ask where LLM agents fall, and what decides it.
+
+The answer bears on simulations meant to inform public decisions. If agents contribute generously by default, the public good appears to provide itself and the institutions Smith thought necessary look redundant. If they contribute nothing, the opposite follows.
+
+We contribute a preregistered audit protocol for LLM decision rules in the linear public goods game, built on payoff-equivalent prompt variants and on control conditions outside the social dilemma. With it we obtain incentive-response curves for six current models and a decomposition of contribution variance into incentive, paraphrase and framing components, which we summarise as a signal-to-noise ratio per model. We also report how the reasoning mode and the name of the game change behaviour, and we release code, prompts and data.
+
+\section{Related Work}
+
+\paragraph{LLM agents in public goods games.}
+Table~\ref{tab:prior} summarises prior designs. The closest is $\gamma$-Bench~\cite{huang2025gama}, whose public goods game has ten agents of one model. For GPT-3.5 the authors vary the multiplier over five values, test five prompt templates with one run each, and report that the model contributes similarly even when the return is zero. The multiplier never exceeds the group size. Li and Shirado~\cite{li2025spontaneous} use one payoff configuration with a binary action and find that reasoning variants cooperate far less. Sreedhar et al.~\cite{sreedhar2025simulating} show with one model that calling the task ``Teamwork'' instead of ``Taxation'' moves contributions from above 60 to below 40 percent, and list their fixed multiplier as a limitation. Mei et al.~\cite{mei2024turing} include a public goods game with scripted co-players in a battery of behavioural games. Beyond public goods, Akata et al.~\cite{akata2025playing} study repeated two-player games and name public goods games as future work, and Pal et al.~\cite{pal2026llm} vary payoffs and continuation probability in the repeated prisoner's dilemma under a neutral description and assess consistency qualitatively.
+
+\begin{table}[t]
+\caption{Design of public goods studies with LLM players. $m$ is the marginal per capita return.}
+\label{tab:prior}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}L{1.85cm}L{2.3cm}L{1.9cm}L{2.5cm}L{2.15cm}@{}}
+\toprule
+Study & Game & Models, runs & Prompt context & Payoff variation \\
+\midrule
+Huang et al.~\cite{huang2025gama} & $N{=}10$, 20 tokens, $m{=}0.2$, 20 rounds & 13 models, 5 runs & ``public pot'', game not named & 5 multipliers, GPT-3.5 only, $m\le 0.4$ \\\addlinespace[2pt]
+Li and Shirado~\cite{li2025spontaneous} & $N{=}4$, 100 points, $m{=}0.5$, binary & 10 models, 100 trials & ``group project'' & none \\\addlinespace[2pt]
+Sreedhar et al.~\cite{sreedhar2025simulating} & 3--4 players, \$20, multiplier 1.6 & 1 model, 5 games per condition & ``PGG-like game'', ``Teamwork'', ``Taxation'' & none \\\addlinespace[2pt]
+Mei et al.~\cite{mei2024turing} & $N{=}4$, \$20, $m{=}0.5$, scripted co-players & 2 models, 30 sessions & names the game, water cleaning project & none \\\addlinespace[2pt]
+This paper & $N{=}4$, 20 points, integer action, one-shot & 6 models, 50 decisions per cell & neutral baseline, 3 paraphrases, worked examples, 3 framings & 4 values in the dilemma, 2 outside \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Framing and prompt sensitivity.}
+Lor\`e and Heydari~\cite{lore2024strategic} cross four two-player games with five narrative contexts and apportion the variation in choices between game structure and context. Such manipulations change the content of the scenario. Ko\v{r}\'inek and \v{S}tekerov\'a~\cite{korinek2026words} report that positively worded and survival-themed prompts raise cooperation in the iterated prisoner's dilemma with constant payoffs. Akata et al.~\cite{akata2025playing} also apply content-preserving rewordings as robustness checks. We are not aware of a study that separates the two kinds of manipulation in one factorial design and quantifies the variation due to rewording alone. For human subjects, presenting the same payoffs as a positive or a negative externality changes contributions~\cite{andreoni1995warm}. We reuse that manipulation.
+
+\paragraph{Validation of generative agent-based models.}
+Larooij and T\"ornberg~\cite{larooij2026validation} require that validation match the purpose of the model, be grounded in external evidence, and be robust across runs, and warn that apparent emergence may reproduce phenomena described in the training data. Zhao et al.~\cite{zhao2026mechanism} separate the ability to reproduce a phenomenon from the plausibility of the mechanism that produces it. Shi et al.~\cite{shi2026llmegta} find that inducing behaviour through system prompts is less effective than shaping it through parameterised payoffs. Evidence on LLMs as stand-ins for human subjects is mixed~\cite{gao2025caution}, and stronger reasoning can move behaviour towards the theoretical solution and away from human data~\cite{kitadai2025reasoning}.
+
+\section{Model}
+
+A group of $N$ agents plays once. Each agent $i$ receives an endowment $E$ and chooses a contribution $c_i \in \{0,1,\dots,E\}$ to a shared account, which is multiplied by $r$ and divided equally:
+\begin{equation}
+u_i(c_i, c_{-i}) = E - c_i + \frac{r}{N}\sum_{j=1}^{N} c_j .
+\label{eq:payoff}
+\end{equation}
+The marginal per capita return is $m = r/N$ and total welfare is $W = NE + (r-1)\sum_i c_i$. The value of $r$ defines three ranges. If $1<r<N$, each point contributed returns $m<1$ to the contributor and $r>1$ to the group, so contributing nothing is a dominant strategy while contributing everything maximises welfare. This is the social dilemma~\cite{samuelson1954pure,ledyard1995public}. If $r<1$, contributing nothing is both dominant and welfare-maximising. If $r>N$, contributing everything is both dominant and welfare-maximising.
+
+We use the last two ranges as controls. Self-interest and collective welfare point the same way there, so an agent that applies the payoff rule should choose the same action whatever its disposition. A positive contribution when $r<1$, or a partial one when $r>N$, cannot be read as cooperation. The controls also guard against recitation, because the textbook answer to a public goods game is wrong when $r>N$.
+
+\paragraph{ODD summary~\cite{grimm2020odd}.}
+\emph{Purpose.} The model audits decision rules by measuring how LLM agents respond to a payoff parameter and to the wording of the task. It is not meant to predict human behaviour or to evaluate policy. \emph{Entities and state variables.} Agents have a model identifier, a reasoning setting and a prompt variant, and the environment holds $N$, $E$ and $r$. \emph{Process.} Each observation is one independent call in which an agent receives the task description and returns one action. The environment validates the action and computes payoffs with Eq.~\eqref{eq:payoff}. \emph{Design concepts.} There is no interaction or adaptation between calls, and stochasticity comes from model sampling. \emph{Initialisation and input.} Configuration files set parameters and seeds, and there are no input data. In the scale of Zhao et al.~\cite{zhao2026mechanism} this is a level-1 model, a reproducible phenomenal description from which we draw no counterfactual conclusions.
+
+\section{Experimental Design}
+\label{sec:design}
+
+\paragraph{Game and incentives.} $N=4$ and $E=20$, as in a standard human design~\cite{fischbacher2010social}. Inside the dilemma $m\in\{0.3, 0.4, 0.5, 0.75\}$, values used in human experiments~\cite{isaac1988group,fischbacher2010social} and in earlier LLM studies (Table~\ref{tab:prior}). The controls are $m=0.2$ ($r<1$) and $m=1.25$ ($r>N$).
+
+\paragraph{Prompt variants.} All eight variants state the same payoff rule, and an automated test confirms that they imply identical payoffs. The baseline P0 follows the neutral style of Pal et al.~\cite{pal2026llm}. It does not name the game and avoids words such as ``public'', ``cooperate'', ``contribute'', ``group'' and ``team''. Three \emph{paraphrases} carry the same information. P1 reorders the sentences and uses another unit. P2 states what each participant receives per unit placed, $m$, instead of the multiplier, also in another unit. P4 uses an itemised layout. P3 adds two worked examples, for nobody and for everybody placing the full endowment. Three \emph{framings} change the scenario. F1 starts with the endowment in the shared account and asks how much to withdraw~\cite{andreoni1995warm}. F2 calls the task ``Teamwork''~\cite{sreedhar2025simulating}. F3 states that it is a public goods game and uses its usual vocabulary~\cite{mei2024turing}. The model must answer with a JSON object containing one integer.
+
+\paragraph{Models.} {\sloppy Six models of the fast, low-cost tier were accessed through one inference provider (OpenCode Go) on 17 November 2026. They were \texttt{gpt-5.6-luna}, \texttt{claude-haiku-5-5}, \texttt{qwen3.8-flash}, \texttt{glm-5.3-flash}, \texttt{deepseek-v4.1-flash} (snapshot 1017) and \texttt{hy3}, of which the last three are released with open weights. Temperature was 1.0. All six were run with reasoning disabled. Five were also run with reasoning enabled at high effort, on the baseline prompt only, because the provider's interface did not enable reasoning for \texttt{gpt-5.6-luna}.\par}
+
+\paragraph{Observations.} With reasoning off the design is fully crossed, with 6 models $\times$ 6 values of $m$ $\times$ 8 variants $\times$ 50 decisions, or 14,400 decisions. The reasoning arm adds 1,500 decisions. Two payoff-calculation questions about the baseline rule were asked in separate calls, 2,040 in total, so that answering them could not influence a decision. An output without a valid action was recorded as invalid and the cell was queried once more, which happened four times. One call failed after transport retries and was completed later. All 17,940 planned cells were completed. The order of calls was shuffled.
+
+\paragraph{Hypotheses and analysis.} The plan was fixed before the confirmatory run, after a pilot of 576 calls that is excluded from the analysis.\footnote{The preregistration and SHA-256 hashes of prompts, code and configurations were generated before the first confirmatory call. They were not posted to a public registry beforehand. Both are in the repository cited under Data and code availability.} Three choices were made after seeing the pilot. Hypothesis H6 was added. The variant with worked examples, first planned as a paraphrase, was set apart because it shifted contributions strongly, and P4 was written to replace it without being piloted. The analyses also allow for nearly binary contributions. The outcome is the contribution as a share of the endowment. \textbf{H1a.} Inside the dilemma contributions increase with $m$, tested per model by regression on $m$ with fixed effects for the four paraphrases (P0, P1, P2, P4). The direction comes from human evidence, since the equilibrium prediction is zero for every $m<1$. \textbf{H1b.} Agents choose the dominant action in the controls. A model passes a control if the interval of its mean lies below 10\% at $m=0.2$ and above 90\% at $m=1.25$, respectively. \textbf{H2.} Variation across paraphrases is greater than zero and smaller than variation across framings. For each model we compute $\eta^2$ in two balanced layouts inside the dilemma, $m \times$ paraphrase and $m \times$ \{P0, F1, F2, F3\}, and report the ratio of $\eta^2$ for $m$ to $\eta^2$ for wording in the paraphrase layout. A ratio below one means that rewording the same game moves the agent more than changing its payoffs. \textbf{H5} (exploratory). Reasoning lowers contributions. Hypothesis labels are those of the preregistration, which has no H3 or H4. \textbf{H6.} Naming the game (F3) lowers contributions relative to P0. This hypothesis was added after the pilot. Intervals are 95\% percentile bootstrap intervals from 10,000 resamples within cells, and $p$-values are Holm-corrected across models.
+
+\section{Results}
+
+\subsection{Incentive response and controls}
+
+Figure~\ref{fig:curves} and Table~\ref{tab:main} show the response to incentives. H1a is supported for two of six models. For \texttt{gpt-5.6-luna} the contribution rises by 49.7 percentage points per unit of $m$ and for \texttt{deepseek-v4.1-flash} by 26.6. Human subjects show slopes of the same order, about 50 in the final period of a classic experiment~\cite{isaac1988group} and about 25 in a large one-shot online study~\cite{gachter2026oneshot}, and a meta-analysis confirms the positive effect~\cite{zelmer2003meta}. For \texttt{glm-5.3-flash}, \texttt{hy3} and \texttt{qwen3.8-flash} the interval of the slope includes zero. \texttt{claude-haiku-5-5} contributed zero in all 800 decisions. The preregistered robustness checks agree in sign with the slopes except for \texttt{hy3}, whose Spearman correlation ($-0.03$) and logistic coefficient for full contribution are negative.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/fig_incentive_response_curves.pdf}
+\caption{Mean contribution against the marginal per capita return. Blue lines show reasoning off, pooled over the four paraphrases, with 95\% intervals. Orange lines show reasoning on with the baseline prompt. The dashed line is the payoff-maximising action and the shaded areas are the out-of-dilemma controls.}
+\label{fig:curves}
+\end{figure}
+
+\begin{table}[t]
+\caption{Reasoning off, paraphrase set. Columns give the slope in percentage points per unit of $m$ inside the dilemma, the mean contribution (\%) in each control with the H1b verdict (\checkmark~pass, $\times$~fail, ?~inconclusive), the correct answers (\%) to the two comprehension questions, and the ratio of variance explained by incentive to variance explained by paraphrase. Brackets are 95\% intervals. $^{*}$Holm-corrected $p<0.05$.}
+\label{tab:main}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4.5pt}
+\begin{tabular}{@{}l r@{\ }l c c r r l@{}}
+\toprule
+ & \multicolumn{2}{c}{Slope (H1a)} & \multicolumn{2}{c}{Controls (H1b)} & \multicolumn{2}{c}{Comprehension} & Signal-to-noise \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+Model & & & $m{=}0.2$ & $m{=}1.25$ & Q1 & Q2 & \\
+\midrule
+gpt-5.6-luna & $49.7^{*}$ & [33.2, 65.8] & 21.0 $\times$ & 97.0 \checkmark & 86 & 0 & 0.18 [0.09, 0.34] \\
+deepseek-v4.1-flash & $26.6^{*}$ & [8.8, 44.1] & 11.3 ? & 47.5 $\times$ & 83 & 40 & 0.07 [0.01, 0.22] \\
+qwen3.8-flash & 9.1 & [$-$7.2, 26.0] & 3.0 \checkmark & 49.9 $\times$ & 88 & 7 & 0.06 [0.02, 0.19] \\
+glm-5.3-flash & 4.6 & [$-$12.4, 21.4] & 1.0 \checkmark & 76.6 $\times$ & 82 & 3 & 0.05 [0.01, 0.19] \\
+hy3 & 4.2 & [$-$7.5, 16.1] & 34.4 $\times$ & 89.3 ? & 88 & 18 & 0.33 [0.22, 0.48] \\
+claude-haiku-5-5 & 0.0 & [0.0, 0.0] & 0.0 \checkmark & 0.0 $\times$ & 100 & 100 & undefined \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+No model passes both controls (H1b). Where contributing is wasteful, three models contribute almost nothing, one is inconclusive and two fail, with 21\% and 34\%. Where contributing everything is dominant, only \texttt{gpt-5.6-luna} passes, and three models contribute about half or less. In the comprehension questions most models compute the payoff of a full contributor among non-contributors (Q1), but five of six fail the mirror question (Q2). \texttt{claude-haiku-5-5} answers both questions correctly in every call and still contributes nothing when contributing is dominant, so under the baseline wording its choice cannot be attributed to an error in computing these payoffs.
+
+\subsection{Paraphrase versus framing}
+
+Wording has a significant main effect in the paraphrase layout for the five models with any variation (Holm-corrected $p<0.001$). Figure~\ref{fig:variance} shows the decomposition. The incentive explains between 0.6\% and 5.8\% of the variance of contributions, and rewording the same game explains between 12.4\% and 18.7\%. The signal-to-noise ratio lies between 0.05 and 0.33, and every upper bound is below 0.5 (Table~\ref{tab:main}), so paraphrase accounts for 3 to 21 times more variance than the incentive. Framing explains more than paraphrase in four of the five models, between 28\% and 67\%. For \texttt{qwen3.8-flash} the two are indistinguishable (difference $-0.01$ [$-0.07$, 0.05]). For \texttt{claude-haiku-5-5} nothing varies in the paraphrase layout, so the ratio is undefined, while framing explains 71\% of its variance. H2 is therefore supported for four of six models.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.8\textwidth]{figures/fig_variance_decomposition.pdf}
+\caption{Share of contribution variance inside the dilemma explained by the incentive and by wording across the four paraphrases, and by wording across the framing set, with 95\% intervals. Reasoning off.}
+\label{fig:variance}
+\end{figure}
+
+Table~\ref{tab:variants} gives the means behind these shares. Within a single model the mean contribution across the four paraphrases ranges over 33 to 55 percentage points, except for \texttt{claude-haiku-5-5}. The paraphrases also interact with the controls. At $m=0.2$ the baseline elicits 2\% and 0\% from \texttt{gpt-5.6-luna} and \texttt{hy3}, whereas P2, which states that each participant receives 0.2 per unit placed, elicits 76\% and 99\%. The worked examples (P3) raise contributions by 27 to 70 points in four models and leave two unchanged.
+
+\begin{table}[t]
+\caption{Mean contribution (\% of endowment) inside the dilemma by prompt variant, reasoning off, 200 decisions per model and variant. The last column gives variant F3 at $m=1.25$ (50 decisions per model), where the dominant action is 100.}
+\label{tab:variants}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3.2pt}
+\begin{tabular}{@{}l rrrr r rrr r@{}}
+\toprule
+ & \multicolumn{4}{c}{Paraphrases} & Examples & \multicolumn{3}{c}{Framings} & F3 at \\
+\cmidrule(lr){2-5}\cmidrule(lr){6-6}\cmidrule(lr){7-9}
+Model & P0 & P1 & P2 & P4 & P3 & F1 take & F2 Teamw. & F3 named & $m{=}1.25$ \\
+\midrule
+gpt-5.6-luna & 39.5 & 50.0 & 76.5 & 91.0 & 38.0 & 7.0 & 77.8 & 0.0 & 0.0 \\
+deepseek-v4.1-flash & 10.5 & 44.8 & 15.9 & 48.3 & 80.0 & 59.8 & 33.1 & 2.0 & 2.0 \\
+qwen3.8-flash & 37.3 & 62.0 & 7.5 & 35.4 & 64.5 & 48.8 & 78.4 & 30.6 & 27.1 \\
+glm-5.3-flash & 28.0 & 55.2 & 18.0 & 58.0 & 70.5 & 63.9 & 88.0 & 21.6 & 28.5 \\
+hy3 & 68.1 & 99.5 & 85.3 & 66.8 & 99.6 & 45.7 & 100.0 & 4.2 & 1.0 \\
+claude-haiku-5-5 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 94.0 & 65.0 & 0.0 & 0.0 \\
+\midrule
+All models & 30.6 & 51.9 & 33.9 & 49.9 & 58.8 & 53.2 & 73.7 & 9.8 & 9.8 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The framings behave as in earlier reports for the ``Teamwork'' label, which raises contributions in every model. Naming the game does the opposite (H6). Inside the dilemma it lowers contributions significantly for three of the five models that contribute anything at baseline, and four of the six models end at 4.2\% or less. At $m=1.25$, where contributing everything maximises the agent's own payoff, it lowers contributions for all five, by 28 to 90 points, leaving four models at 2\% or less. Under this variant the answers of these models match the textbook answer to the named game and not the action implied by the stated payoffs. F3 changes the vocabulary as well as the name, so the two cannot be separated here. The take frame splits the models. \texttt{gpt-5.6-luna} withdraws almost everything, whereas \texttt{claude-haiku-5-5} leaves 94\% of the endowment in the shared account on average inside the dilemma and all of it in both controls. That model answers with the number zero in 96\% of its decisions under the take frame, as it does in all of them under the baseline, so the same answer counts as full contribution in one description and as none in the other.
+
+\subsection{Reasoning}
+
+Switching reasoning on changes the results (Fig.~\ref{fig:curves}, Table~\ref{tab:reasoning}). On the baseline prompt, four of five models contribute zero in every decision at every dilemma value and at $m=0.2$, and \texttt{glm-5.3-flash} contributes 7.8\%. The difference from reasoning off is negative at every dilemma value for the four models that contribute anything at baseline, with intervals that exclude zero except for \texttt{deepseek-v4.1-flash} at $m=0.4$ and $0.5$. At $m=1.25$ two models contribute 98\% to 100\% and one 84\%, while two stay near one half, one of them below its level without reasoning. Comprehension is perfect for four models. With reasoning on, the returned text of 90\% to 100\% of decisions under the neutral prompt contains game-theoretic vocabulary such as ``public goods'', ``Nash'' or ``free rider'', against less than 1\% with reasoning off. This is a count of words in the answer and the reasoning trace, and it says nothing about how the action was produced.
+
+\begin{table}[t]
+\caption{Baseline prompt P0. Mean contribution (\%) with reasoning off and on, inside the dilemma (four values of $m$ pooled) and at $m=1.25$, comprehension with reasoning on, and the share of decisions (\%) whose text contains game-theoretic vocabulary. Reasoning could not be enabled for \texttt{gpt-5.6-luna}.}
+\label{tab:reasoning}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{@{}l rr rr rr r@{}}
+\toprule
+ & \multicolumn{2}{c}{Dilemma} & \multicolumn{2}{c}{$m=1.25$} & \multicolumn{2}{c}{Comprehension, on} & Vocabulary, \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+Model & off & on & off & on & Q1 & Q2 & on \\
+\midrule
+deepseek-v4.1-flash & 10.5 & 0.0 & 30.0 & 100.0 & 100 & 100 & 99.0 \\
+hy3 & 68.1 & 0.0 & 88.0 & 98.0 & 100 & 100 & 100.0 \\
+qwen3.8-flash & 37.3 & 0.0 & 56.0 & 84.0 & 100 & 100 & 97.7 \\
+glm-5.3-flash & 28.0 & 7.8 & 66.5 & 48.0 & 100 & 60 & 98.3 \\
+claude-haiku-5-5 & 0.0 & 0.0 & 0.0 & 46.0 & 100 & 100 & 90.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Discussion}
+
+\paragraph{Which reference do the agents resemble?} The answer depends on whether reasoning is switched on. With reasoning on, most of the models tested behave as the players of the Nash prediction, which is also the prediction of the \emph{Wealth of Nations} for public works. They contribute nothing inside the dilemma, and when contributing becomes dominant two of five models reach 98\% to 100\% and a third 84\%. This extends to the continuous game, and to a sweep of the return, the finding that reasoning lowers cooperation~\cite{li2025spontaneous} and moves behaviour towards the theoretical solution~\cite{kitadai2025reasoning}. With reasoning off the same models resemble none of the references. Their average contribution can be made to look like the generosity of the \emph{Moral Sentiments}, like laboratory subjects, or like free riders by changing words that leave the payoffs untouched, and only two of six respond to the return in the way people do. The public good is provided at 74\% under the label ``Teamwork'' and at 10\% when the game is named.
+
+\paragraph{Implications for modellers.} First, the reasoning mode and the wording are parameters of the model with first-order effects, and they should be reported and varied like any other parameter. Second, a paraphrase audit is cheap. A few payoff-equivalent rewordings and a sweep of the main incentive, about 800 calls per model here, give a signal-to-noise ratio that tells whether the simulated behaviour reflects the mechanism or the phrasing. In our data it was below one for the five models for which it is defined. Third, conditions in which every disposition implies the same action are an effective test of whether the rule is applied. None of the reasoning-off configurations passed both. Fourth, naming a well-known scenario can elicit its textbook answer even where that answer contradicts the stated payoffs. This is consistent with the concern about data leakage in generative simulations~\cite{larooij2026validation}, although our design does not identify the cause. For simulations that inform public decisions, a conclusion about whether a good provides itself would here be decided by configuration choices that usually go unreported.
+
+\paragraph{Limitations.} The audit covers six models of the fast, low-cost tier, accessed through an intermediary on a single day. The served versions are those reported by the provider. It covers one group size, one endowment, a one-shot decision, English prompts and one temperature. The reasoning arm used only the baseline prompt, so we do not know whether reasoning removes the sensitivity to wording. Running it under all eight variants is left for future work. The comparison with human behaviour is limited to direction and order of magnitude, because designs differ. H6 and the composition of the paraphrase set were fixed after the pilot, and the preregistration was not publicly posted before the run. It did not foresee one case, in which no decision varies and the signal-to-noise ratio is reported as undefined. We do not study interaction. Repeated play, mixed populations of LLM and rule-based agents, and conditional cooperation are the next steps, and the present results indicate that they should be run under several wordings.
+
+\section{Conclusion}
+
+In a one-shot public goods game, five of six current fast-tier LLMs used without explicit reasoning responded more to how the game was worded than to its payoffs, and none of the six chose the dominant action in both control conditions. With reasoning enabled, four of five contributed nothing inside the dilemma, as the equilibrium predicts. For agent-based modellers the practical consequence is that an LLM decision rule should be audited against payoff-equivalent rewordings and out-of-dilemma controls before its collective outcomes are interpreted.
+
+\begin{credits}
+\subsubsection{Data and code availability.} Code, prompts, configurations, the full ODD description, the preregistration and all raw responses are available at \url{https://github.com/Pepebeats-flp/llm-public-goods-audit}.
+
+\subsubsection{Use of AI tools.} An AI coding assistant (Claude, Anthropic) was used to write the code, run the analysis, and draft and revise the text. The authors take full responsibility for the content.
+
+\subsubsection{\discintname}
+The authors have no competing interests to declare that are relevant to the content of this article.
+\end{credits}
+
+\bibliographystyle{splncs04}
+\bibliography{references}
+
+\end{document}
