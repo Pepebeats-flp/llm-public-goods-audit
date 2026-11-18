@@ -1,0 +1,26 @@
+{
+  "game": "pd",
+  "n": 2,
+  "endowment": 20,
+  "temperature": 1.0,
+  "min_interval": 1.5,
+  "group": "study3",
+  "gate_file": "../paper_ssc2027/STUDY3_GO.txt",
+  "run_id": "study3_rep_mix_deepseek-v4_1-flash",
+  "runner": "repeated",
+  "mpcr": 0.7,
+  "rounds": 10,
+  "models": [
+    {
+      "model": "deepseek-v4.1-flash",
+      "effort": "none"
+    }
+  ],
+  "variants": [
+    "P0"
+  ],
+  "groups": 15,
+  "composition": "one_selfish",
+  "max_allowance_usd": 0.5,
+  "seed": 2027534
+}

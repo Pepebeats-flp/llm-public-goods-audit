@@ -1,0 +1,38 @@
+{
+  "game": "pd",
+  "n": 2,
+  "endowment": 20,
+  "temperature": 1.0,
+  "min_interval": 1.5,
+  "group": "study3",
+  "gate_file": "../paper_ssc2027/STUDY3_GO.txt",
+  "run_id": "study3_off_glm-5_3-flash",
+  "mpcrs": [
+    0.4,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    1.25
+  ],
+  "models": [
+    {
+      "model": "glm-5.3-flash",
+      "effort": "none"
+    }
+  ],
+  "variants": [
+    "P0",
+    "P1",
+    "P2",
+    "P4",
+    "P3",
+    "F1",
+    "F2",
+    "F3"
+  ],
+  "reps": 50,
+  "comprehension_reps": 20,
+  "max_allowance_usd": 1.0,
+  "seed": 2027503
+}

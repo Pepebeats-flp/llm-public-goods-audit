@@ -61,13 +61,13 @@ def reciprocity(d):
     return np.array(out, float)
 
 
-def analyse(pattern, tag, n_boot, seed):
+def analyse(pattern, tag, n_boot, seed, title="Study 2, part B"):
     raw = load(pattern)
     if raw.empty:
         raise SystemExit("no repeated-game data for " + pattern)
     rng = np.random.default_rng(seed)
     out = os.path.join(ROOT, "data", "processed")
-    rep = [f"# Study 2, part B: {tag}\n"]
+    rep = [f"# {title}: {tag}\n"]
     P = rep.append
 
     games = raw.groupby("key").agg(status=("game_status", "first"), label=("label", "first"),
@@ -176,7 +176,8 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--glob", default="data/raw/study2_rep_*.jsonl")
     ap.add_argument("--tag", default="study2B")
+    ap.add_argument("--title", default="Study 2, part B")
     ap.add_argument("--boot", type=int, default=10000)
     ap.add_argument("--seed", type=int, default=20270403)
     a = ap.parse_args()
-    analyse(a.glob, a.tag, a.boot, a.seed)
+    analyse(a.glob, a.tag, a.boot, a.seed, a.title)

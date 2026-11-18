@@ -1,0 +1,25 @@
+{
+  "game": "pd",
+  "n": 2,
+  "endowment": 20,
+  "temperature": 1.0,
+  "min_interval": 1.5,
+  "group": "techtest",
+  "run_id": "techtest_pd_repeated",
+  "runner": "repeated",
+  "mpcr": 0.7,
+  "rounds": 10,
+  "models": [
+    {
+      "model": "gpt-5.6-luna",
+      "effort": "none"
+    }
+  ],
+  "variants": [
+    "P0"
+  ],
+  "groups": 1,
+  "composition": "homogeneous",
+  "max_allowance_usd": 0.05,
+  "seed": 1
+}

@@ -31,6 +31,7 @@ import random
 import sys
 import time
 
+from . import pd
 from .agents import Selfish
 from .game import Game
 from .llm import Client, parse_amount
@@ -52,11 +53,23 @@ def _finished_games(path):
     return keys
 
 
-def play_game(game, rounds, seats, variant, decide):
+def pgg_prompt(variant, game, rounds, t, history):
+    """Prompt and output parser of the public goods game for one decision."""
+    text, conv = repeated_prompt(variant, game, rounds, t, history)
+
+    def parse(output):
+        amount = parse_amount(output, game.endowment)
+        return None if amount is None else conv(amount)
+    return text, parse
+
+
+def play_game(game, rounds, seats, variant, decide, prompt_fn=pgg_prompt):
     """Play one game.
 
     seats: list of "llm" or "selfish", one per player.
-    decide(seat_index, prompt): returns (contribution or None, list of attempt records).
+    prompt_fn(variant, game, rounds, t, history): returns (prompt, parse) where parse maps the
+        model output to a contribution or None.
+    decide(seat_index, prompt, parse): returns (contribution or None, list of attempt records).
         None with a non-empty list means two invalid outputs; None with records flagged
         transport_failed means the call could not be completed.
     Returns (status, rows) with status in {"complete", "discarded", "transport_failed"}.
@@ -74,8 +87,8 @@ def play_game(game, rounds, seats, variant, decide):
                                    "amount": c, "contribution": c})
                 contributions.append(c)
                 continue
-            prompt, conv = repeated_prompt(variant, game, rounds, t, histories[i])
-            c, attempts = decide(i, prompt)
+            prompt, parse = prompt_fn(variant, game, rounds, t, histories[i])
+            c, attempts = decide(i, prompt, parse)
             for a in attempts:
                 a.update(round=t, seat=i, agent_type="llm",
                          prompt_sha=hashlib.sha256(prompt.encode()).hexdigest()[:12])
@@ -84,7 +97,7 @@ def play_game(game, rounds, seats, variant, decide):
                 rows += round_rows
                 failed = any(a.get("transport_failed") for a in attempts)
                 return ("transport_failed" if failed else "discarded"), rows
-            contributions.append(conv(c))
+            contributions.append(c)
         payoffs = game.payoffs(contributions)
         for i in range(len(seats)):
             others = [c for j, c in enumerate(contributions) if j != i]
@@ -104,7 +117,8 @@ def main(config_path):
     out_path = os.path.join("data", "raw", cfg["run_id"] + ".jsonl")
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     done = _finished_games(out_path)
-    client = Client("pgg-" + cfg["run_id"], min_interval=cfg.get("min_interval", 1.5))
+    client = Client("pgg-" + cfg["run_id"], min_interval=cfg.get("min_interval", 1.5), timeout=cfg.get("timeout_s", 180))
+    is_pd = cfg.get("game") == "pd"
     mc = cfg["models"][0]
     label = mc.get("label") or f"{mc['model']}@{mc.get('effort')}"
     game = Game(cfg["n"], cfg["endowment"], round(cfg["mpcr"] * cfg["n"], 6))
@@ -117,12 +131,12 @@ def main(config_path):
     spent = [0.0]
     cap = cfg.get("max_allowance_usd", 1.0)
 
-    def decide(seat, prompt):
+    def decide(seat, prompt, parse):
         attempts = []
         for attempt in (1, 2):
             resp, retries, temp_used = _call(client, mc["model"], prompt, cfg.get("temperature"), mc.get("effort"))
             spent[0] += _allowance(resp)
-            amount = parse_amount(resp.get("text"), game.endowment) if resp["ok"] else None
+            amount = parse(resp.get("text")) if resp["ok"] else None
             attempts.append({
                 "ts": time.time(), "attempt": attempt, "ok": resp["ok"], "transport_retries": retries,
                 "temperature": temp_used, "text": resp.get("text"), "reasoning_text": resp.get("reasoning_text"),
@@ -146,7 +160,20 @@ def main(config_path):
             if spent[0] >= cap:
                 print(f"allowance cap reached ({spent[0]:.4f} >= {cap}); stopping", flush=True)
                 break
-            status, rows = play_game(game, cfg["rounds"], seats, variant, decide)
+            coop_first = gi % 2 == 0          # prisoner's dilemma: the cooperative label alternates across games
+            if is_pd:
+                pd_game = pd.PD(cfg["endowment"], cfg["mpcr"])
+
+                def prompt_fn(variant_, game_, rounds_, t_, history_):
+                    text, labels = pd.repeated_prompt(variant_, pd_game, rounds_, t_, history_, coop_first)
+
+                    def parse(output):
+                        coop = pd.parse_choice(output, labels)
+                        return None if coop is None else (game_.endowment if coop else 0)
+                    return text, parse
+                status, rows = play_game(game, cfg["rounds"], seats, variant, decide, prompt_fn)
+            else:
+                status, rows = play_game(game, cfg["rounds"], seats, variant, decide)
             if status == "transport_failed":
                 err = next((r.get("error") for r in rows if r.get("transport_failed")), "")
                 http = next((r.get("http_status") for r in rows if r.get("transport_failed")), None)
@@ -162,6 +189,8 @@ def main(config_path):
                          effort=mc.get("effort"), variant=variant, composition=composition, game_index=gi,
                          n=game.n, endowment=game.endowment, mpcr=cfg["mpcr"], r=game.r, rounds=cfg["rounds"],
                          game_status=status)
+                if is_pd:
+                    r.update(game="pd", coop_first=coop_first)
                 out.write(json.dumps(r) + "\n")
             out.flush()
             n_games += 1

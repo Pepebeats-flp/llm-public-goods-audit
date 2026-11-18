@@ -16,6 +16,8 @@ Config keys:
   seed              shuffles the order of cells so that time is not confounded with condition
   shard             optional {"index": i, "of": k}: take every k-th cell of the shuffled list
   also_done_from    optional list of run ids whose completed cells are not asked again
+  game              optional "pd": prisoner's dilemma (pgg.pd) instead of the public goods game
+  timeout_s         optional client timeout in seconds (default 180)
 
 Rules fixed before running:
   * Transport failures (HTTP 429/5xx, timeouts) are retried up to 3 times with backoff and
@@ -30,6 +32,7 @@ import random
 import sys
 import time
 
+from . import pd
 from .game import Game
 from .llm import Client, parse_amount, parse_json_field
 from .prompts import KIND, VARIANTS, comprehension_items
@@ -97,7 +100,8 @@ def main(config_path):
     out_path = os.path.join("data", "raw", cfg["run_id"] + ".jsonl")
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     done = _done_keys(out_path)
-    client = Client("pgg-" + cfg["run_id"], min_interval=cfg.get("min_interval", 1.5))
+    client = Client("pgg-" + cfg["run_id"], min_interval=cfg.get("min_interval", 1.5), timeout=cfg.get("timeout_s", 180))
+    is_pd = cfg.get("game") == "pd"
 
     for other in cfg.get("also_done_from", []):      # cells already collected by a run this one continues
         done |= _done_keys(os.path.join("data", "raw", other + ".jsonl"))
@@ -113,11 +117,21 @@ def main(config_path):
             if spent >= cap:
                 print(f"allowance cap reached ({spent:.4f} >= {cap}); stopping", flush=True)
                 break
-            game = Game(cfg["n"], cfg["endowment"], round(m * cfg["n"], 6))
-            if kind == "decision":
-                prompt, conv = VARIANTS[v](game)
+            labels = coop_first = None
+            if is_pd:
+                # prisoner's dilemma: the label that stands for cooperation alternates with the replicate
+                game = pd.PD(cfg["endowment"], m)
+                coop_first = rep % 2 == 0
+                if kind == "decision":
+                    prompt, labels = pd.VARIANTS[v](game, coop_first)
+                else:
+                    item_name, prompt, correct = pd.comprehension_items(game, coop_first)[int(v[1]) - 1]
             else:
-                item_name, prompt, correct = comprehension_items(game)[int(v[1]) - 1]
+                game = Game(cfg["n"], cfg["endowment"], round(m * cfg["n"], 6))
+                if kind == "decision":
+                    prompt, conv = VARIANTS[v](game)
+                else:
+                    item_name, prompt, correct = comprehension_items(game)[int(v[1]) - 1]
             for attempt in (1, 2):
                 resp, retries, temp_used = _call(client, mc["model"], prompt, cfg.get("temperature"), mc.get("effort"))
                 spent += _allowance(resp)
@@ -134,7 +148,13 @@ def main(config_path):
                     "usage": resp.get("usage"), "latency_s": resp.get("latency_s"),
                     "error": resp.get("error"), "http_status": resp.get("http_status"),
                 }
-                if kind == "decision":
+                if kind == "decision" and is_pd:
+                    coop = pd.parse_choice(resp.get("text"), labels) if resp["ok"] else None
+                    row.update(variant_kind=KIND[v], game="pd", coop_first=coop_first,
+                               choice=parse_json_field(resp.get("text"), "choice") if resp["ok"] else None,
+                               cooperate=coop, amount=None, valid=coop is not None,
+                               contribution=(game.endowment if coop else 0) if coop is not None else None)
+                elif kind == "decision":
                     amount = parse_amount(resp.get("text"), game.endowment) if resp["ok"] else None
                     row.update(variant_kind=KIND[v], amount=amount, valid=amount is not None,
                                contribution=conv(amount) if amount is not None else None)
@@ -143,6 +163,8 @@ def main(config_path):
                     numeric = isinstance(ans, (int, float)) and not isinstance(ans, bool)
                     row.update(item=item_name, answer=ans, correct_answer=correct, valid=numeric,
                                correct=bool(numeric and abs(ans - correct) < 1e-6))
+                    if is_pd:
+                        row.update(game="pd", coop_first=coop_first)
                 out.write(json.dumps(row) + "\n")
                 out.flush()
                 n_new += 1

@@ -13,6 +13,7 @@ No se ejecuta el código de Google. Ese código está escrito para papers de con
 | Entrada: plantilla y reglas de la sede | `templates/ssc2027_lncs/` | Lista; basada en SSC 2025 y 2026, a confirmar con el CFP 2027 |
 | Entrada: figuras | `latex_writeup/figures/` | Cuatro generadas; el paper usa dos |
 | Planes de análisis | `preregistration.md`, `preregistration_study2.md` y sus manifiestos | Estudio 1: público solo después de correr. Estudio 2: público antes de correr, sin OSF |
+| Plan del Estudio 3 (dilema del prisionero) | `preregistration_study3.md` y su manifiesto | Público antes de correr. Sin datos todavía. La versión del paper con un solo juego queda en `latex_writeup/paper_v2_pgg_only.tex` |
 | Desviaciones | `deviations_study2.md`, y sección de desviaciones del log | Registradas |
 | 1. Esquema | `outline.json` | Plan original |
 | 2. Revisión de literatura | `literature/references.bib` | 38 entradas verificadas; el paper cita 22 |

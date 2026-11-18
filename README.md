@@ -6,6 +6,7 @@ Two studies, run on 17 and 18 November 2026.
 
 - **Study 1.** One-shot decisions: six models, six values of the marginal per capita return, eight payoff-equivalent or reframed descriptions of the same game, 50 decisions per cell without reasoning, plus a reasoning arm on the baseline prompt and comprehension probes. 17,940 cells.
 - **Study 2.** Part A repeats the one-shot design with reasoning on for five models and all eight descriptions (12,000 decisions). Part B is a ten-round game in groups of four agents with feedback (410 games, 15,503 calls).
+- **Study 3 (planned, not run yet).** The same three blocks in a two-player prisoner's dilemma with the same six models (34,140 calls). The plan is in `paper_ssc2027/preregistration_study3.md` and was made public before any model call.
 
 ## Main results
 
@@ -19,12 +20,12 @@ Two studies, run on 17 and 18 November 2026.
 | Path | Content |
 |---|---|
 | `llm-public-goods-study/pgg/` | Game engine, prompt variants, API client, runner, supervisor, analysis and figures |
-| `llm-public-goods-study/tests/` | Environment validation (19 tests) |
+| `llm-public-goods-study/tests/` | Environment validation (27 tests) |
 | `llm-public-goods-study/configs/` | One configuration per model and reasoning setting; snapshot of model metadata |
 | `llm-public-goods-study/data/raw/` | One JSON line per API call: parsed action, returned text, reasoning trace, usage, timing |
 | `llm-public-goods-study/data/processed/` | Tables and the analysis report |
 | `llm-public-goods-study/docs/ODD.md` | Full model description (ODD protocol) |
-| `paper_ssc2027/preregistration.md`, `preregistration_study2.md` | Analysis plans of the two studies, with file hashes in the manifests |
+| `paper_ssc2027/preregistration.md`, `preregistration_study2.md`, `preregistration_study3.md` | Analysis plans of the studies, with file hashes in the manifests |
 | `paper_ssc2027/raw_materials/experimental_log.md` | Every number used in the manuscript |
 | `paper_ssc2027/latex_writeup/` | Manuscript source (Springer LNCS) and figures |
 | `paper_ssc2027/review/` | Internal review rounds |

@@ -95,6 +95,16 @@ None. The model metadata recorded for documentation (`configs/opencode_go_models
 
 **Observation.** One row per decision with round, seat, contribution, payoff, mean of the others and round total. A game is written only when it ends (`pgg/run_repeated.py`). A group is discarded if an agent returns two invalid outputs in a round; a game interrupted by a transport failure is not recorded and is played again.
 
+## Addendum: prisoner's dilemma (Study 3)
+
+**Entities and state variables.** Two agents per game. The environment is `PD(E, m)` in `pgg/pd.py` with E = 20 and m in {0.4, 0.6, 0.7, 0.8, 0.9, 1.25}. The action is binary. Payoffs are R = 2mE (both cooperate), T = E + mE, P = E (both defect) and S = mE, which are the payoffs of the public goods game with N = 2, r = 2m and a contribution of 0 or E. The regime is `dilemma` for 0.5 < m < 1, `control_inefficient` at m = 0.4 (defecting is dominant and efficient) and `control_dominant` at m = 1.25 (cooperating is dominant).
+
+**Sensing.** The agent senses a description of the four outcomes with two option labels. The label that stands for cooperation alternates with the replicate (one-shot) or with the pair (repeated game) and is recorded as `coop_first`. The eight wordings parallel those of the public goods game (P0, P1, P2, P4, P3, F1, F2, F3). F3 names the prisoner's dilemma and uses the labels "cooperate" and "defect".
+
+**Process.** As in sections 3 and the repeated-game addendum, with the answer format `{"choice": "<label>"}`. The choice is stored as `cooperate` and as a `contribution` of E or 0. In the repeated game (T = 10, m = 0.7) the history shows, for each past round, the agent's own choice, the other's choice and the agent's points. A pair is homogeneous (two LLM agents) or mixed (one LLM agent and a rule-based agent that always defects).
+
+**Comprehension probes.** Two questions on the baseline description: the points of a participant who cooperates against a defector (S) and of one who defects against a cooperator (T).
+
 ## Verification
 
-`python3 -m unittest discover -s tests` runs 19 tests covering the payoff rule, regimes and dominant actions (by enumeration), payoff equivalence of the variants, vocabulary of the neutral variants, answer keys of the probes, output parsing, reproducibility of the rule-based agents, and for the repeated game the prompts, the history shown to each agent, the recorded payoffs and the discard rules.
+`python3 -m unittest discover -s tests` runs 27 tests covering the payoff rule, regimes and dominant actions (by enumeration), payoff equivalence of the variants, vocabulary of the neutral variants, answer keys of the probes, output parsing, reproducibility of the rule-based agents, and for the repeated game the prompts, the history shown to each agent, the recorded payoffs and the discard rules, and for the prisoner's dilemma the payoff order, dominance, payoff equivalence of the wordings under both label assignments, the parser and the repeated history.

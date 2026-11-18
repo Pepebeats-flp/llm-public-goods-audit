@@ -166,15 +166,15 @@ def snapshot():
     lines = [f"Estado de las corridas   {time.strftime('%Y-%m-%d %H:%M:%S')}",
              f"Supervisor: {'activo (pid %d), reinicia corridas caídas' % sup if sup else 'no activo'}", ""]
 
-    names = {"final": "ESTUDIO 1 (final)", "study2": "ESTUDIO 2"}
-    for grp in [g for g in ("final", "study2") if any(c.get("group") == g for _, c, _ in runs)]:
+    names = {"final": "ESTUDIO 1 (final)", "study2": "ESTUDIO 2", "study3": "ESTUDIO 3 (prisionero)"}
+    for grp in [g for g in ("final", "study2", "study3") if any(c.get("group") == g for _, c, _ in runs)]:
         part = [(n, c, d) for n, c, d in runs if c.get("group") == grp]
         tot = sum(total_cells(c) * calls_per_cell(c) for _, c, _ in part)
         done = sum(len(d["done"]) * calls_per_cell(c) for _, c, d in part)
         recent = sum(1 for _, _, d in part for t in d["ts"] if now - t <= 120)
         spent = sum(d["allowance"] for _, _, d in part)
         n_alive = sum(1 for n, _, _ in part if n in alive)
-        lines.append(f"{names[grp]:18} {bar(done, tot)}  {done}/{tot} llamadas   {n_alive} de {len(part)} procesos activos")
+        lines.append(f"{names[grp]:23} {bar(done, tot)}  {done}/{tot} llamadas   {n_alive} de {len(part)} procesos activos")
         lines.append(f"  ritmo total {recent / 2:.0f} llamadas/min (últimos 2 min)   cuota usada {spent:.4f} USD")
         lines.append("")
 
@@ -228,7 +228,7 @@ def snapshot():
     if warnings:
         lines += ["", "AVISOS:"] + ["  " + w for w in warnings]
     if any(gate_missing(c) for _, c, _ in runs):
-        lines += ["", "Las corridas 'bloqueada' esperan el registro público del plan de análisis:",
+        lines += ["", "Las corridas 'bloqueada' esperan el archivo de autorización (se crea al dar la partida):",
                   "  " + next(gate_missing(c) for _, c, _ in runs if gate_missing(c))]
     lines += ["", "* celda = una decisión (una ronda) o un juego completo (juego repetido)"]
     if not runs:

@@ -25,6 +25,14 @@ from .summarize import final_rows
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 DILEMMA = [0.3, 0.4, 0.5, 0.75]
 CTRL_LOW, CTRL_HIGH = 0.2, 1.25
+# Incentive values per game: (dilemma range, control where the dominant action is 0, control where it is 100)
+DESIGNS = {"pgg": ([0.3, 0.4, 0.5, 0.75], 0.2, 1.25), "pd": ([0.6, 0.7, 0.8, 0.9], 0.4, 1.25)}
+
+
+def use_game(name):
+    """Select the incentive values of a game. The list is changed in place so that importers see it."""
+    global CTRL_LOW, CTRL_HIGH
+    DILEMMA[:], CTRL_LOW, CTRL_HIGH = DESIGNS[name]
 ALPHA = 0.05
 
 
@@ -341,6 +349,26 @@ def analyse(pattern, tag, n_boot, seed, paraphrases, framings):
         P("## H5 (exploratory): reasoning on minus off, baseline prompt P0\n")
         P(md(h5.round(1), index=False) + "\n")
 
+    # ---- prisoner's dilemma only: balance and effect of the label that stands for cooperation ----
+    if "coop_first" in ok and ok.coop_first.notna().any():
+        lab = ok[ok.coop_first.notna()].copy()
+        lab["coop_is_A"] = lab.coop_first.astype(bool)
+        lab["chose_A"] = (lab.cooperate.astype(bool) == lab.coop_is_A).astype(float)
+        rows = []
+        for label, g in lab.groupby("label"):
+            a, b = g[g.coop_is_A].s.to_numpy(float), g[~g.coop_is_A].s.to_numpy(float)
+            row = dict(label=label, n_coop_is_A=len(a), n_coop_is_B=len(b), chose_A_pct=pct(g.chose_A.mean()))
+            if len(a) > 1 and len(b) > 1:
+                d_b = a[rng.integers(0, len(a), (n_boot, len(a)))].mean(1) - b[rng.integers(0, len(b), (n_boot, len(b)))].mean(1)
+                lo, hi = ci(d_b)
+                row.update(coop_pct_when_A=pct(a.mean()), coop_pct_when_B=pct(b.mean()), diff_pp=pct(a.mean() - b.mean()),
+                           ci_lo=pct(lo), ci_hi=pct(hi))
+            rows.append(row)
+        labels = pd.DataFrame(rows)
+        labels.to_csv(os.path.join(out, f"{tag}_label_effect.csv"), index=False)
+        P("## Label of the cooperative option (A or B, alternated by design)\n")
+        P(md(labels.round(1), index=False) + "\n")
+
     # ---- distribution and comprehension --------------------------------------------------------
     E = int(ok.endowment.iloc[0])
     dist = ok.groupby("label").contribution.agg(
@@ -374,5 +402,7 @@ if __name__ == "__main__":
     ap.add_argument("--seed", type=int, default=20270401)
     ap.add_argument("--paraphrases", default=",".join(PARAPHRASE_SET))
     ap.add_argument("--framings", default=",".join(FRAMING_SET))
+    ap.add_argument("--game", default="pgg", choices=sorted(DESIGNS))
     a = ap.parse_args()
+    use_game(a.game)
     analyse(a.glob, a.tag, a.boot, a.seed, a.paraphrases.split(","), a.framings.split(","))

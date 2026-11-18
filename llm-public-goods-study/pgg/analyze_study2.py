@@ -18,7 +18,8 @@ import statsmodels.formula.api as smf
 from scipy import stats
 from statsmodels.stats.multitest import multipletests
 
-from .analyze import ALPHA, CTRL_HIGH, CTRL_LOW, DILEMMA, boot_cells, ci, fe_slope, layout, md, pct, two_way_eta
+from . import analyze as A
+from .analyze import ALPHA, DILEMMA, boot_cells, ci, fe_slope, layout, md, pct, two_way_eta
 from .prompts import FRAMING_SET, PARAPHRASE_SET
 from .summarize import final_rows
 
@@ -72,10 +73,10 @@ def sensitivity(d, n_boot, rng):
     return out
 
 
-def analyse(on, off, on_old, tag, n_boot, seed):
+def analyse(on, off, on_old, tag, n_boot, seed, title="Study 2, part A"):
     rng = np.random.default_rng(seed)
     out = os.path.join(ROOT, "data", "processed")
-    rep = [f"# Study 2, part A: {tag}\n"]
+    rep = [f"# {title}: {tag}\n"]
     P = rep.append
     models = sorted(on.model.unique())
     P(f"Reasoning-on decisions: {len(on)} | models: {', '.join(models)} | bootstrap: {n_boot} | seed: {seed}\n")
@@ -83,7 +84,7 @@ def analyse(on, off, on_old, tag, n_boot, seed):
     P("## Mean contribution (%) by variant, reasoning on, dilemma range\n")
     t = on[on.mpcr.isin(DILEMMA)].groupby(["model", "variant"]).s.mean().mul(100).unstack().round(1)
     P(md(t[[v for v in ["P0", "P1", "P2", "P4", "P3", "F1", "F2", "F3"] if v in t]]) + "\n")
-    for m, title in ((CTRL_HIGH, "control m = 1.25 (dominant action 100)"), (CTRL_LOW, "control m = 0.2 (dominant action 0)")):
+    for m, title in ((A.CTRL_HIGH, f"control m = {A.CTRL_HIGH:g} (dominant action 100)"), (A.CTRL_LOW, f"control m = {A.CTRL_LOW:g} (dominant action 0)")):
         t = on[on.mpcr == m].groupby(["model", "variant"]).s.mean().mul(100).unstack().round(1)
         P(f"## Mean contribution (%) by variant, reasoning on, {title}\n")
         P(md(t[[v for v in ["P0", "P1", "P2", "P4", "P3", "F1", "F2", "F3"] if v in t]]) + "\n")
@@ -131,7 +132,7 @@ def analyse(on, off, on_old, tag, n_boot, seed):
             row.update(slope_pp=pct(slope), p_one_sided=(1 - stats.norm.cdf(slope / se)) if se > 0 else (0.0 if slope > 0 else 1.0))
             lo, hi = ci(fe_slope(boot_cells(groups, n_boot, rng)[0], ns, m_vals, b_idx))
             row.update(slope_lo=pct(lo), slope_hi=pct(hi), dilemma_mean_pct=pct(d.s.mean()))
-        for m, thr, direction, name in ((CTRL_LOW, 0.10, "<=", "ctrl_low"), (CTRL_HIGH, 0.90, ">=", "ctrl_high")):
+        for m, thr, direction, name in ((A.CTRL_LOW, 0.10, "<=", "ctrl_low"), (A.CTRL_HIGH, 0.90, ">=", "ctrl_high")):
             y = on[(on.model == model) & (on.mpcr == m) & on.variant.isin(PARAPHRASE_SET)].s.to_numpy(float)
             if len(y) == 0:
                 continue
@@ -151,7 +152,7 @@ def analyse(on, off, on_old, tag, n_boot, seed):
     # ---- A3: named game against baseline with reasoning on -----------------------------------------
     rows = []
     for model in models:
-        for region, ms in (("dilemma", DILEMMA), ("control_m>1", [CTRL_HIGH])):
+        for region, ms in (("dilemma", DILEMMA), ("control_m>1", [A.CTRL_HIGH])):
             base = on[(on.model == model) & on.mpcr.isin(ms) & (on.variant == "P0")].s.to_numpy(float)
             y = on[(on.model == model) & on.mpcr.isin(ms) & (on.variant == "F3")].s.to_numpy(float)
             if len(y) < 2 or len(base) < 2:
@@ -193,7 +194,17 @@ if __name__ == "__main__":
     ap.add_argument("--boot", type=int, default=10000)
     ap.add_argument("--seed", type=int, default=20270402)
     ap.add_argument("--selftest", action="store_true", help="run the code on Study 1 reasoning-off data only")
+    ap.add_argument("--game", default="pgg", choices=sorted(A.DESIGNS),
+                    help="pd: Study 3, prisoner's dilemma (reasoning on against reasoning off, same study)")
     a = ap.parse_args()
+    if a.game == "pd":
+        A.use_game("pd")
+        off, _ = decisions("data/raw/study3_off_*.jsonl")
+        on, _ = decisions("data/raw/study3_on_*.jsonl")
+        if on.empty or off.empty:
+            raise SystemExit("no Study 3 data yet")
+        analyse(on, off, on.iloc[0:0], "study3A", a.boot, a.seed, title="Study 3, reasoning on against off")
+        raise SystemExit(0)
     off, _ = decisions("data/raw/final_off_*.jsonl")
     if a.selftest:
         analyse(off, off.iloc[0:0], off.iloc[0:0], "selftest_study2A", a.boot, a.seed)

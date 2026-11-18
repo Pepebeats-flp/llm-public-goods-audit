@@ -1,0 +1,43 @@
+{
+  "game": "pd",
+  "n": 2,
+  "endowment": 20,
+  "temperature": 1.0,
+  "min_interval": 1.5,
+  "group": "study3",
+  "gate_file": "../paper_ssc2027/STUDY3_GO.txt",
+  "run_id": "study3_on_qwen3_8-flash_s1",
+  "mpcrs": [
+    0.4,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    1.25
+  ],
+  "models": [
+    {
+      "model": "qwen3.8-flash",
+      "effort": "high"
+    }
+  ],
+  "variants": [
+    "P0",
+    "P1",
+    "P2",
+    "P4",
+    "P3",
+    "F1",
+    "F2",
+    "F3"
+  ],
+  "reps": 50,
+  "comprehension_reps": 0,
+  "timeout_s": 600,
+  "seed": 2027511,
+  "max_allowance_usd": 1.0,
+  "shard": {
+    "index": 1,
+    "of": 4
+  }
+}

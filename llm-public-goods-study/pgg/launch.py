@@ -4,7 +4,7 @@
   python3 -m pgg.launch --no-watch  # start and return
   python3 -m pgg.launch --stop      # stop the supervisor and all runs (they can be resumed later)
 
-One detached process per study config in configs/ (group "final" or "study2"), plus a detached supervisor that
+One detached process per study config in configs/ (group "final", "study2" or "study3"), plus a detached supervisor that
 checks every 30 s and restarts a run that died before finishing. Runs are resumable, so a
 restart never repeats a completed cell. Closing the terminal or pressing Ctrl+C in the
 status view does not stop anything. Running this command again is safe: it starts only
@@ -12,8 +12,8 @@ what is not already running or finished.
 
 The supervisor does not restart a run that stopped for a reason a person must look at:
 authorisation or quota errors, or the allowance cap of the config. A config with a
-"gate_file" is not started until that file exists; Study 2 uses this to wait for the
-public registration of its analysis plan.
+"gate_file" is not started until that file exists. Study 3 uses this: nothing starts until
+paper_ssc2027/STUDY3_GO.txt exists, which is created after the analysis plan is public.
 """
 import glob
 import json
@@ -34,7 +34,7 @@ BLOCKERS = ("authorisation or quota error", "allowance cap reached")
 
 from .status import gate_missing, read_run, total_cells  # noqa: E402
 
-GROUPS = ("final", "study2")
+GROUPS = ("final", "study2", "study3")
 
 
 def configs():
@@ -118,7 +118,7 @@ def supervise():
                     continue
                 if gate_missing(cfg):
                     if restarts.get(rid) != "gated":
-                        note(f"{rid}: waiting for the public registration file {gate_missing(cfg)}")
+                        note(f"{rid}: waiting for the gate file {gate_missing(cfg)}")
                         restarts[rid] = "gated"
                     continue
                 if restarts.get(rid) == "gated":
